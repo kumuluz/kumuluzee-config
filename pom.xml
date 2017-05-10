@@ -13,7 +13,7 @@
 
     <inceptionYear>2017</inceptionYear>
     <description>
-        Logging management extensions for the lightweight Kumuluz EE framework.
+        Config management extensions for the lightweight Kumuluz EE framework.
     </description>
 
     <url>https://ee.kumuluz.com</url>

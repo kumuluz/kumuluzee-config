@@ -23,6 +23,7 @@ package com.kumuluz.ee.config;
 
 import com.kumuluz.ee.config.exceptions.EtcdNotInitialisedException;
 import com.kumuluz.ee.configuration.ConfigurationSource;
+import com.kumuluz.ee.configuration.utils.ConfigurationDispatcher;
 import com.kumuluz.ee.configuration.utils.ConfigurationUtil;
 import io.netty.handler.ssl.SslContext;
 import io.netty.handler.ssl.SslContextBuilder;
@@ -58,6 +59,7 @@ public class Etcd2ConfigurationSource implements ConfigurationSource {
     private static Etcd2ConfigurationSource instance;
 
     private EtcdClient etcd;
+    private ConfigurationDispatcher configurationDispatcher;
     private String namespace;
 
     public static Etcd2ConfigurationSource getInstance() {
@@ -293,8 +295,8 @@ public class Etcd2ConfigurationSource implements ConfigurationSource {
                             String value = response.node.value;
                             log.info("Value changed. Key: " + fullKey + " New value: " + value);
 
-                            if (value != null) {
-                                ConfigurationUtil.getInstance().notifyChange(key, value);
+                            if (configurationDispatcher != null && value != null) {
+                                configurationDispatcher.notifyChange(key, value);
                             }
                         }
 
@@ -362,5 +364,10 @@ public class Etcd2ConfigurationSource implements ConfigurationSource {
 
     public String getNamespace() {
         return this.namespace;
+    }
+
+    @Override
+    public void setConfigurationDispatcher(ConfigurationDispatcher configurationDispatcher) {
+        this.configurationDispatcher = configurationDispatcher;
     }
 }

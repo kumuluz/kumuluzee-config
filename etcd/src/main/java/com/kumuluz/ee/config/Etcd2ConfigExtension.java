@@ -36,7 +36,7 @@ import java.util.Optional;
  *
  * @author Jan Meznarič
  */
-@EeExtensionDef(name = "etcd configuration source for API v2", type = EeExtensionType.CONFIG)
+@EeExtensionDef(name = "etcd configuration source for etcd API v2", type = EeExtensionType.CONFIG)
 public class Etcd2ConfigExtension implements Extension {
 
     private ConfigurationSource configurationSource;

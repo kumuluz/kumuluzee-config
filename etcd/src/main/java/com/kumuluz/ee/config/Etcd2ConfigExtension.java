@@ -39,7 +39,7 @@ import java.util.Optional;
 @EeExtensionDef(name = "etcd configuration source for API v2", type = EeExtensionType.CONFIG)
 public class Etcd2ConfigExtension implements Extension {
 
-    ConfigurationSource configurationSource;
+    private ConfigurationSource configurationSource;
 
     @Override
     public void init(KumuluzServerWrapper kumuluzServerWrapper, EeConfig eeConfig) {

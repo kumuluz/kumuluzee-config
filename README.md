@@ -29,11 +29,12 @@ following dependency:
 </dependency>
 ```
 
-Currently, only API v2 is supported. Future releases will support API v3 in form of a new KumuluzEE Config module.
+Currently, only API v2 is supported. Future releases will support API v3 in a form of a new KumuluzEE Config module.
 
 **Configuring etcd**
 
-An odd number of etcd hosts must be specified with configuration key `kumuluzee.config.etcd.hosts` in format 
+To connect to an etcd cluster, an odd number of etcd hosts must be specified with configuration key `kumuluzee.config
+.etcd.hosts` in format 
 `'http://192.168.29.168:2379,http://192.168.29.169:2379,http://192.168.29.170:2379'`.
 
 Etcd can be configured to support user authentication and client-to-server transport security with HTTPS. To access 
@@ -90,7 +91,7 @@ public class ConfigPropertiesExample {
 **Watches**
 
 Since configuration properties in etcd can be updated during microservice runtime, they have to be dynamically 
-updated inside the running microservice. This behaviour can be achived with watches.
+updated inside the running microservices. This behaviour can be enabled with watches.
 
 Watches can be enabled with annotation parameter `@ConfigValue(watch = true)` or by subscribing to key changes.
 

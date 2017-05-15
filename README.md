@@ -116,7 +116,7 @@ Subscribing to key changes is done with an instance of `ConfigurationUtil` class
 ```java
 String watchedKey = "test-service.config.maintenance";
 
-ConfigurationUtil.getInstance().subscribe((String key, String value) -> {
+ConfigurationUtil.getInstance().subscribe(watchedKey, (String key, String value) -> {
 
     if (watchedKey == key) {
 
@@ -128,7 +128,7 @@ ConfigurationUtil.getInstance().subscribe((String key, String value) -> {
 
     }
 
-}, watchedKey);
+});
 ```
 
 

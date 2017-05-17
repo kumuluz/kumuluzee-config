@@ -35,7 +35,7 @@ Currently, only API v2 is supported. Future releases will support API v3 in a fo
 
 To connect to an etcd cluster, an odd number of etcd hosts must be specified with configuration key `kumuluzee.config
 .etcd.hosts` in format 
-`'http://192.168.29.168:2379,http://192.168.29.169:2379,http://192.168.29.170:2379'`.
+`'http://192.168.99.100:2379,http://192.168.99.101:2379,http://192.168.99.102:2379'`.
 
 Etcd can be configured to support user authentication and client-to-server transport security with HTTPS. To access 
 authentication-enabled etcd host, username and password have to be defined with configuration keys 

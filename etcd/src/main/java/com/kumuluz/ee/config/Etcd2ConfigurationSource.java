@@ -28,6 +28,7 @@ import com.kumuluz.ee.configuration.utils.ConfigurationUtil;
 import io.netty.handler.ssl.SslContext;
 import io.netty.handler.ssl.SslContextBuilder;
 import mousio.client.retry.RetryOnce;
+import mousio.client.retry.RetryWithExponentialBackOff;
 import mousio.etcd4j.EtcdClient;
 import mousio.etcd4j.EtcdSecurityContext;
 import mousio.etcd4j.promises.EtcdResponsePromise;
@@ -148,16 +149,12 @@ public class Etcd2ConfigurationSource implements ConfigurationSource {
 
             if (etcdSecurityContext != null) {
 
-                etcd = new EtcdClient(etcdSecurityContext, etcdHosts).setRetryHandler(new RetryOnce(1000));
+                etcd = new EtcdClient(etcdSecurityContext, etcdHosts).setRetryHandler(new RetryOnce(0));
 
             } else {
 
-                etcd = new EtcdClient(etcdHosts).setRetryHandler(new RetryOnce(1000));
+                etcd = new EtcdClient(etcdHosts).setRetryHandler(new RetryOnce(0));
 
-            }
-
-            if (etcd.getHealth() == null) {
-                throw new EtcdNotInitialisedException();
             }
 
             log.info("etcd2 configuration source successfully initialised.");
@@ -277,7 +274,7 @@ public class Etcd2ConfigurationSource implements ConfigurationSource {
             log.info("Initializing watch for key: " + fullKey);
             try {
                 EtcdResponsePromise<EtcdKeysResponse> responsePromise = etcd.get(parseKeyNameForEtcd(fullKey))
-                        .waitForChange().send();
+                        .setRetryPolicy(new RetryWithExponentialBackOff(20, -1, 10000)).waitForChange().send();
 
                 responsePromise.addListener(promise -> {
 

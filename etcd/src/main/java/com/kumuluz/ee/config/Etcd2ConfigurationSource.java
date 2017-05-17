@@ -62,6 +62,8 @@ public class Etcd2ConfigurationSource implements ConfigurationSource {
     private EtcdClient etcd;
     private ConfigurationDispatcher configurationDispatcher;
     private String namespace;
+    private int startRetryDelay;
+    private int maxRetryDelay;
 
     public static Etcd2ConfigurationSource getInstance() {
         if (instance == null) {
@@ -149,20 +151,28 @@ public class Etcd2ConfigurationSource implements ConfigurationSource {
 
             if (etcdSecurityContext != null) {
 
-                etcd = new EtcdClient(etcdSecurityContext, etcdHosts).setRetryHandler(new RetryOnce(0));
+                etcd = new EtcdClient(etcdSecurityContext, etcdHosts);
 
             } else {
 
-                etcd = new EtcdClient(etcdHosts).setRetryHandler(new RetryOnce(0));
+                etcd = new EtcdClient(etcdHosts);
 
             }
+
+            etcd.setRetryHandler(new RetryOnce(0));
+
+            // get retry dellays
+            startRetryDelay = configurationUtil.getInteger("kumuluzee.config.etcd.start-retry-delay-ms")
+                    .orElse(500);
+            maxRetryDelay = configurationUtil.getInteger("kumuluzee.config.etcd.max-retry-delay-ms")
+                    .orElse(900000);
 
             log.info("etcd2 configuration source successfully initialised.");
 
         } else {
             log.severe("No etcd server hosts provided. Specify hosts with configuration key" +
                     "kumuluzee.config.etcd.hosts in format " +
-                    "http://192.168.29.168:2379,http://192.168.29.169:2379,http://192.168.29.170:2379");
+                    "http://192.168.99.100:2379,http://192.168.99.101:2379,http://192.168.99.102:2379");
 
             throw new EtcdNotInitialisedException();
         }
@@ -274,7 +284,8 @@ public class Etcd2ConfigurationSource implements ConfigurationSource {
             log.info("Initializing watch for key: " + fullKey);
             try {
                 EtcdResponsePromise<EtcdKeysResponse> responsePromise = etcd.get(parseKeyNameForEtcd(fullKey))
-                        .setRetryPolicy(new RetryWithExponentialBackOff(20, -1, 10000)).waitForChange().send();
+                        .setRetryPolicy(new RetryWithExponentialBackOff(startRetryDelay, -1, maxRetryDelay))
+                        .waitForChange().send();
 
                 responsePromise.addListener(promise -> {
 

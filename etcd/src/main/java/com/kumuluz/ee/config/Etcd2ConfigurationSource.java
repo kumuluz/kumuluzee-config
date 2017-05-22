@@ -21,7 +21,6 @@
 
 package com.kumuluz.ee.config;
 
-import com.kumuluz.ee.config.exceptions.EtcdNotInitialisedException;
 import com.kumuluz.ee.configuration.ConfigurationSource;
 import com.kumuluz.ee.configuration.utils.ConfigurationDispatcher;
 import com.kumuluz.ee.configuration.utils.ConfigurationUtil;
@@ -65,21 +64,10 @@ public class Etcd2ConfigurationSource implements ConfigurationSource {
     private int startRetryDelay;
     private int maxRetryDelay;
 
-    public static Etcd2ConfigurationSource getInstance() {
-        if (instance == null) {
-            instance = new Etcd2ConfigurationSource();
-            try {
-                instance.init();
-            } catch (EtcdNotInitialisedException e) {
-                log.severe("etcd not initialised");
-                return null;
-            }
-        }
-        return instance;
-    }
-
     @Override
-    public void init() {
+    public void init(ConfigurationDispatcher configurationDispatcher) {
+
+        this.configurationDispatcher = configurationDispatcher;
 
         // get namespace
         ConfigurationUtil configurationUtil = ConfigurationUtil.getInstance();
@@ -173,8 +161,6 @@ public class Etcd2ConfigurationSource implements ConfigurationSource {
             log.severe("No etcd server hosts provided. Specify hosts with configuration key" +
                     "kumuluzee.config.etcd.hosts in format " +
                     "http://192.168.99.100:2379,http://192.168.99.101:2379,http://192.168.99.102:2379");
-
-            throw new EtcdNotInitialisedException();
         }
 
     }
@@ -372,10 +358,5 @@ public class Etcd2ConfigurationSource implements ConfigurationSource {
 
     public String getNamespace() {
         return this.namespace;
-    }
-
-    @Override
-    public void setConfigurationDispatcher(ConfigurationDispatcher configurationDispatcher) {
-        this.configurationDispatcher = configurationDispatcher;
     }
 }

@@ -44,8 +44,7 @@ public class Etcd2ConfigExtension implements Extension {
     @Override
     public void init(KumuluzServerWrapper kumuluzServerWrapper, EeConfig eeConfig) {
 
-        configurationSource = Etcd2ConfigurationSource.getInstance();
-
+        configurationSource = new Etcd2ConfigurationSource();
     }
 
     @Override

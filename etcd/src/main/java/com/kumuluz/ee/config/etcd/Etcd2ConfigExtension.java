@@ -18,26 +18,22 @@
  *  software. See the License for the specific language governing permissions and
  *  limitations under the License.
 */
+package com.kumuluz.ee.config.etcd;
 
-package com.kumuluz.ee.config;
-
-import com.kumuluz.ee.common.Extension;
+import com.kumuluz.ee.common.ConfigExtension;
 import com.kumuluz.ee.common.config.EeConfig;
 import com.kumuluz.ee.common.dependencies.EeExtensionDef;
 import com.kumuluz.ee.common.dependencies.EeExtensionType;
 import com.kumuluz.ee.common.wrapper.KumuluzServerWrapper;
 import com.kumuluz.ee.configuration.ConfigurationSource;
 
-import java.util.List;
-import java.util.Optional;
-
 /**
  * KumuluzEE framework extension for adding etcd configuration source in configuration util.
  *
  * @author Jan Meznarič
  */
-@EeExtensionDef(name = "etcd configuration source for etcd API v2", type = EeExtensionType.CONFIG)
-public class Etcd2ConfigExtension implements Extension {
+@EeExtensionDef(name = "etcd", type = EeExtensionType.CONFIG)
+public class Etcd2ConfigExtension implements ConfigExtension {
 
     private ConfigurationSource configurationSource;
 
@@ -49,31 +45,10 @@ public class Etcd2ConfigExtension implements Extension {
 
     @Override
     public void load() {
-
     }
 
     @Override
-    public <T> Optional<T> getProperty(Class<T> aClass) {
-
-        if (aClass.equals(ConfigurationSource.class) && configurationSource != null) {
-            return Optional.of((T) configurationSource);
-        }
-
-        return Optional.empty();
-    }
-
-    @Override
-    public <T> Optional<T> getProperty(Class<T> aClass, String s) {
-        return null;
-    }
-
-    @Override
-    public <T> Optional<List<T>> getProperties(Class<T> aClass) {
-        return null;
-    }
-
-    @Override
-    public <T> Optional<List<T>> getProperties(Class<T> aClass, String s) {
-        return null;
+    public ConfigurationSource getConfigurationSource() {
+        return configurationSource;
     }
 }

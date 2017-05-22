@@ -19,7 +19,7 @@
  *  limitations under the License.
 */
 
-package com.kumuluz.ee.config;
+package com.kumuluz.ee.config.etcd;
 
 import com.kumuluz.ee.configuration.ConfigurationSource;
 import com.kumuluz.ee.configuration.utils.ConfigurationDispatcher;
@@ -56,7 +56,6 @@ import java.util.logging.Logger;
 public class Etcd2ConfigurationSource implements ConfigurationSource {
 
     private static final Logger log = Logger.getLogger(Etcd2ConfigurationSource.class.getName());
-    private static Etcd2ConfigurationSource instance;
 
     private EtcdClient etcd;
     private ConfigurationDispatcher configurationDispatcher;
@@ -200,11 +199,7 @@ public class Etcd2ConfigurationSource implements ConfigurationSource {
 
         Optional<String> value = get(key);
 
-        if (value.isPresent()) {
-            return Optional.of(Boolean.valueOf(value.get()));
-        } else {
-            return Optional.empty();
-        }
+        return value.map(Boolean::valueOf);
     }
 
     @Override
@@ -318,13 +313,7 @@ public class Etcd2ConfigurationSource implements ConfigurationSource {
                     log.severe("Error: value was not set.");
                 }
 
-            } catch (IOException e) {
-                log.severe("Cannot set key: " + e);
-            } catch (EtcdException e) {
-                log.severe("Cannot set key: " + e);
-            } catch (EtcdAuthenticationException e) {
-                log.severe("Cannot set key: " + e);
-            } catch (TimeoutException e) {
+            } catch (IOException | EtcdException | EtcdAuthenticationException | TimeoutException e) {
                 log.severe("Cannot set key: " + e);
             }
         }

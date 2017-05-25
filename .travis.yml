@@ -20,8 +20,10 @@ cache:
   - "$HOME/.m2"
 
 install: mvn clean install -DskipTests=true -V -U
-
 script: mvn test
 
-after_success:
-- mvn source:jar javadoc:jar deploy -Pdeploy -DskipTests=true --settings ./settings.xml
+deploy:
+  provider: script
+  script: mvn source:jar javadoc:jar deploy -Pdeploy -DskipTests=true --settings ./settings.xml
+  on:
+    branch: master

@@ -24,6 +24,6 @@ script: mvn test
 
 deploy:
   provider: script
-  script: ./scripts/deploy.sh
+  script: sh ./scripts/deploy.sh
   on:
     branch: master

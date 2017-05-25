@@ -1,7 +1,7 @@
 # KumuluzEE Config
 [![Build Status](https://img.shields.io/travis/kumuluz/kumuluzee-config/master.svg?style=flat)](https://travis-ci.org/kumuluz/kumuluzee-config)
 
-> An open-source configuration extension for the KumuluzEE framework
+> Configuration extension for the KumuluzEE microservice framework with support for configuration servers, such as etcd and Consul.
 
 KumuluzEE Config is an open-source configuration management extension for the KumuluzEE framework. It extends basic 
 configuration framework which is a part of KumuluzEE framework, described 

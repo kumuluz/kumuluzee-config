@@ -10,10 +10,10 @@ env:
   - secure: kCzaDl9farFlAMGpbWXqerCplOD3C+m75OXT6sulQkXMfN1lv+UNby6GWqCOfYyun4oVRJeFC6sT2SHhel4jDKfTZgA6qKiP8JLKMKMsrWsvfvFlkElN8xOUEU4nh67rwpOeBrf9wyrkyEM1LdsKqS20I7069yrnPjCxBzl2Vrqi73fKoCq4KF+aKsVK+i+8UcsDYA7qqkiPz8qo2TOeMFzHWZwuk5NTQvXzaKhZ8+VFApN6Vcagaal65GXtLaXAthSUYLnUeoZ2ylDjTrP44GtZyxJhL6OdvIoEiDect6pwMyOjBVUpTLR/L99z5eAZRo7xjkYqjKimb/xv+mqQXE/94EzpiiUAkxQ5akvrY6MIsBC7ogusofx8NUEeMSKGT/Qok4BXVZKJh6ppoRDK0SRsujJOJxWmJllrtIE/soGMtuPeoZBkAprNsoDuxNTbT7cvhzCRZEhDNa0/7vWffTXOEhwONIVA7O8XQaPnxRUyvUqpjIt8XX3PVL6W20gD1EQJcfTh71tOErAC0soRXOO2ObPPWxj/AvFaIapGtRrUL3KPr7VLdNUFsa97SM0ab3QmTo/cyhyLcSpSIUZ7TpMx/7MB0MjX5h8mGvIWAgBWG+/92Bc4f0WLqKIndK0mnUCWkfLwHG7ms7/M8xybMOEXEByQYP7L3issRfHFMj0=
   - secure: XPB+i02bQcckqvEd4V9kTlBYFU/Y4V2syMK06ZvEQbB0lMtPyKiLYMYApuro3x0ULV2bQ07cPkDL2bBpAhlLRnPKXyxhKTT8mL6auiWZKSfeTByaCy6/2OV1aLsmSlMuqElzTycv+JwGluEReateTBYQ4jsSiCtibzv5Pty1z70LYBPsMlSoHExZ4PalPjS5t1PernSuTFnUepyKC3qpzwX/KaLkytRvfJBVhYFbM517p69OGu4ZEVKdeCKMcSJWRBT22E9R5BuFpW5O7/9B+xQVHvK/bfmqkQlmMwg6M0ycFOKneQtdFtRsBcvUthBC6httatguIjZ1SmH/wYpbQCATGcaXxr2mtcZVYH47cAckX7LF0ThtL9QytiTyDKYVJcAz6ltahKcAlHvEbPSajloMcNdFvd9MWiT2e3em9+GjSfShC5UdxOb9LsrRSMS3O5vQmS3eCHsCHGfhx2yYbuUelX794XIRDDQf/NTIfsDmSLoCQKZoR/7OLwbfM6M0pFFvlzp8jSs9iPd9nMZI9LiHmJISKRf7XNTsu6hqEsFC2xE5gAvjgS5r0lhv6+5zZW7q7G6eip3uT3VVJqxxv4HxBfuJ7bkAfgMtZJUREsI/g7NgWXplZuQ1zIEZ/L6kkYxqO45I3dqunmyHDdnd6ITzeCfhnQXHHj5T2Qa3npU=
 
-before_install:
-- openssl aes-256-cbc -K $encrypted_bc82b4744960_key -iv $encrypted_bc82b4744960_iv
-  -in gpg.tar.gz.enc -out gpg.tar.gz -d
-- tar xvf gpg.tar.gz
+#before_install:
+#- openssl aes-256-cbc -K $encrypted_bc82b4744960_key -iv $encrypted_bc82b4744960_iv
+#  -in gpg.tar.gz.enc -out gpg.tar.gz -d
+#- tar xvf gpg.tar.gz
 
 cache:
   directories:
@@ -24,6 +24,10 @@ script: mvn test
 
 deploy:
   provider: script
-  script: mvn source:jar javadoc:jar deploy -Pdeploy -DskipTests=true --settings ./settings.xml
+  script:
+  - openssl aes-256-cbc -K $encrypted_bc82b4744960_key -iv $encrypted_bc82b4744960_iv
+    -in gpg.tar.gz.enc -out gpg.tar.gz -d
+  - tar xvf gpg.tar.gz
+  - mvn source:jar javadoc:jar deploy -Pdeploy -DskipTests=true --settings ./settings.xml
   on:
     branch: master

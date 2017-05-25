@@ -22,8 +22,21 @@ cache:
 install: mvn clean install -DskipTests=true -V -U
 script: mvn test
 
-deploy:
-  provider: script
-  script: sh ./scripts/deploy.sh
-  on:
-    branch: master
+#deploy:
+#  provider: script
+#  script: sh ./scripts/deploy.sh
+#  on:
+#    branch: master
+
+jobs:
+  include:
+    - stage: deploy to OSSHR
+      rvm: 2.2
+      script:
+      - openssl aes-256-cbc -K $encrypted_bc82b4744960_key -iv $encrypted_bc82b4744960_iv -in gpg.tar.gz.enc -out gpg.tar.gz -d
+      - tar xvf gpg.tar.gz
+      deploy:
+        provider: script
+        script: mvn source:jar javadoc:jar deploy -Pdeploy -DskipTests=true --settings ./settings.xml
+        on:
+          branch: master

@@ -43,6 +43,9 @@ following dependency:
 </dependency>
 ```
 
+Note that currently, only one configuration server implementation (etcd or Consul) can be added to a single project.
+Adding both of them may result in unexpected behaviour.
+
 **Configuring etcd**
 
 To connect to an etcd cluster, an odd number of etcd hosts must be specified with configuration key `kumuluzee.config

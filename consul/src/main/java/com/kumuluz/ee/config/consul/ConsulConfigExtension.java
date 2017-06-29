@@ -18,7 +18,7 @@
  *  software. See the License for the specific language governing permissions and
  *  limitations under the License.
 */
-package com.kumuluz.ee.config.etcd;
+package com.kumuluz.ee.config.consul;
 
 import com.kumuluz.ee.common.ConfigExtension;
 import com.kumuluz.ee.common.config.EeConfig;
@@ -30,21 +30,21 @@ import com.kumuluz.ee.configuration.ConfigurationSource;
 import java.util.logging.Logger;
 
 /**
- * KumuluzEE framework extension for adding etcd configuration source in configuration util.
+ * KumuluzEE framework extension for adding Consul configuration source in configuration util.
  *
- * @author Jan Meznarič
+ * @author Jan Meznarič, Urban Malc
  */
-@EeExtensionDef(name = "etcd", type = EeExtensionType.CONFIG)
-public class Etcd2ConfigExtension implements ConfigExtension {
+@EeExtensionDef(name = "Consul", type = EeExtensionType.CONFIG)
+public class ConsulConfigExtension implements ConfigExtension {
 
-    private static final Logger log = Logger.getLogger(Etcd2ConfigExtension.class.getName());
+    private static final Logger log = Logger.getLogger(ConsulConfigExtension.class.getName());
 
     private ConfigurationSource configurationSource;
 
     @Override
     public void init(KumuluzServerWrapper kumuluzServerWrapper, EeConfig eeConfig) {
-        log.info("Initialising etcd2 configuration source.");
-        configurationSource = new Etcd2ConfigurationSource();
+        log.info("Initialising Consul configuration source.");
+        configurationSource = new ConsulConfigurationSource();
     }
 
     @Override

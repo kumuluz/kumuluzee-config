@@ -23,6 +23,8 @@ package com.kumuluz.ee.config.utils;
 
 import com.kumuluz.ee.configuration.utils.ConfigurationUtil;
 
+import java.util.Optional;
+
 /**
  * Util class for getting initialization parameters.
  *
@@ -46,12 +48,22 @@ public class InitializationUtils {
     }
 
     public static int getStartRetryDelayMs(ConfigurationUtil configurationUtil, String implementation) {
-        return configurationUtil.getInteger("kumuluzee.config." + implementation + ".start-retry-delay-ms")
-                .orElse(500);
+        Optional<Integer> universalConfig = configurationUtil.getInteger("kumuluzee.config.start-retry-delay-ms");
+        if(universalConfig.isPresent()) {
+            return universalConfig.get();
+        } else {
+            return configurationUtil.getInteger("kumuluzee.config." + implementation + ".start-retry-delay-ms")
+                    .orElse(500);
+        }
     }
 
     public static int getMaxRetryDelayMs(ConfigurationUtil configurationUtil, String implementation) {
-        return configurationUtil.getInteger("kumuluzee.config." + implementation + ".max-retry-delay-ms")
-                .orElse(900000);
+        Optional<Integer> universalConfig = configurationUtil.getInteger("kumuluzee.config.max-retry-delay-ms");
+        if(universalConfig.isPresent()) {
+            return universalConfig.get();
+        } else {
+            return configurationUtil.getInteger("kumuluzee.config." + implementation + ".max-retry-delay-ms")
+                    .orElse(900000);
+        }
     }
 }

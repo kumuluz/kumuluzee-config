@@ -168,8 +168,8 @@ the key is deleted from configuration server, a value from other configuration s
 Etcd and Consul implementations support retry delays on watch connection errors. Since they use increasing exponential
 delay, two parameters need to be specified:
 
-- `kumuluzee.config.etcd.start-retry-delay-ms`, which sets the retry delay duration in ms on first error - default: 500
-- `kumuluzee.config.etcd.max-retry-delay-ms`, which sets the maximum delay duration in ms on consecutive errors -
+- `kumuluzee.config.start-retry-delay-ms`, which sets the retry delay duration in ms on first error - default: 500
+- `kumuluzee.config.max-retry-delay-ms`, which sets the maximum delay duration in ms on consecutive errors -
 default: 900000 (15 min)
 
 

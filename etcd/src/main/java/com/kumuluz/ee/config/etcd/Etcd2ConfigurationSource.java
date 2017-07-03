@@ -43,8 +43,7 @@ import java.net.URI;
 import java.security.cert.CertificateException;
 import java.security.cert.CertificateFactory;
 import java.security.cert.X509Certificate;
-import java.util.Base64;
-import java.util.Optional;
+import java.util.*;
 import java.util.concurrent.TimeoutException;
 import java.util.logging.Logger;
 
@@ -255,6 +254,44 @@ public class Etcd2ConfigurationSource implements ConfigurationSource {
     @Override
     public Optional<Integer> getListSize(String key) {
         return Optional.empty();
+    }
+
+    @Override
+    public Optional<List<String>> getMapKeys(String key) {
+
+        key = namespace + "." + key;
+
+        if (etcd != null) {
+
+            List<EtcdKeysResponse.EtcdNode> nodes = null;
+            try {
+                nodes = etcd.getDir(parseKeyNameForEtcd(key)).send().get().getNode().getNodes();
+            } catch (IOException e) {
+                log.severe("IO Exception. Cannot read given key: " + e + " Key: " + key);
+            } catch (EtcdException e) {
+                log.info("etcd: " + e + " Key: " + key);
+            } catch (EtcdAuthenticationException e) {
+                log.severe("Etcd authentication exception. Cannot read given key: " + e + " Key: " + key);
+            } catch (TimeoutException e) {
+                log.severe("Timeout exception. Cannot read given key time: " + e + " Key: " + key);
+            }
+
+            Set<String> mapKeys = new HashSet<>();
+            if (nodes != null) {
+                for (EtcdKeysResponse.EtcdNode node : nodes) {
+                    String[] splittedKey = node.getKey().split("/");
+                    mapKeys.add(splittedKey[splittedKey.length - 1]);
+                }
+            }
+
+            if (mapKeys.isEmpty()) {
+                return Optional.empty();
+            } else {
+                return Optional.of(new ArrayList<>(mapKeys));
+            }
+        } else {
+            return Optional.empty();
+        }
     }
 
     public void watch(String key) {

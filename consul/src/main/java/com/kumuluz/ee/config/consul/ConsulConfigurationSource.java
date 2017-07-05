@@ -36,7 +36,9 @@ import com.orbitz.consul.option.QueryOptions;
 import javax.annotation.Nonnull;
 import java.math.BigInteger;
 import java.net.ConnectException;
-import java.util.Optional;
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.util.*;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.logging.Logger;
 
@@ -78,12 +80,27 @@ public class ConsulConfigurationSource implements ConfigurationSource {
 
         this.configurationDispatcher = configurationDispatcher;
 
+        URL consulAgentUrl = null;
+        try {
+            consulAgentUrl = new URL(configurationUtil.get("kumuluzee.config.consul.agent").orElse
+                    ("http://localhost:8500"));
+        } catch (MalformedURLException e) {
+            log.warning("Provided Consul Agent URL is not valid. Defaulting to http://localhost:8500");
+            try {
+                consulAgentUrl = new URL("http://localhost:8500");
+            } catch (MalformedURLException e1) {
+                e1.printStackTrace();
+            }
+        }
+        log.info("Connecting to Consul Agent at: " + consulAgentUrl.toString());
+
         // withReadTimeoutMillis: Sets read timeout on underlying library (okhttp).
         // timeout is calculated by using Consul formula for maximum waiting time with added time (1s) for connection
         // delays. For formula and more details, see: https://www.consul.io/api/index.html#blocking-queries
         consul = Consul.builder()
-                .withPing(false)
-                .withReadTimeoutMillis(CONSUL_WATCH_WAIT_SECONDS*1000 + (CONSUL_WATCH_WAIT_SECONDS*1000) / 16 + 1000)
+                .withUrl(consulAgentUrl).withPing(false)
+                .withReadTimeoutMillis(CONSUL_WATCH_WAIT_SECONDS * 1000 + (CONSUL_WATCH_WAIT_SECONDS * 1000) / 16 +
+                        1000)
                 .build();
 
         boolean pingSuccessful = false;
@@ -96,7 +113,7 @@ public class ConsulConfigurationSource implements ConfigurationSource {
 
         kvClient = consul.keyValueClient();
 
-        if(pingSuccessful) {
+        if (pingSuccessful) {
             log.info("Consul configuration source successfully initialised.");
         } else {
             log.warning("Consul configuration source initialized, but Consul agent inaccessible. " +
@@ -148,6 +165,29 @@ public class ConsulConfigurationSource implements ConfigurationSource {
     }
 
     @Override
+    public Optional<List<String>> getMapKeys(String key) {
+
+        key = this.namespace + "." + key;
+
+        Set<String> mapKeys = new HashSet();
+
+        try {
+            for (String mapKey : kvClient.getKeys(parseKeyNameForConsul(key))) {
+                String[] splittedKey = mapKey.split("/");
+                mapKeys.add(splittedKey[splittedKey.length - 1]);
+            }
+        } catch (ConsulException e) {
+            log.severe("Consul exception: " + e.getLocalizedMessage());
+        }
+
+        if (mapKeys != null && !mapKeys.isEmpty()) {
+            return Optional.of(new ArrayList<>(mapKeys));
+        }
+
+        return Optional.empty();
+    }
+
+    @Override
     public void watch(String key) {
 
         String fullKey = this.namespace + "." + key;
@@ -170,7 +210,7 @@ public class ConsulConfigurationSource implements ConfigurationSource {
                 // successful request, reset delay
                 currentRetryDelay = startRetryDelay;
 
-                if(index.get() != null && !index.get().equals(consulResponse.getIndex())) {
+                if (index.get() != null && !index.get().equals(consulResponse.getIndex())) {
                     if (consulResponse.getResponse().isPresent()) {
 
                         Value v = consulResponse.getResponse().get();
@@ -184,12 +224,12 @@ public class ConsulConfigurationSource implements ConfigurationSource {
                             previouslyDeleted = false;
                         }
 
-                    } else if(!previouslyDeleted) {
+                    } else if (!previouslyDeleted) {
                         log.info("Consul watch callback for key " + parseKeyNameForConsul(fullKey) +
                                 " invoked. No value present, fallback to other configuration sources.");
                         ConfigurationUtil configurationUtil = ConfigurationUtil.getInstance();
                         String fallbackConfig = configurationUtil.get(key).orElse(null);
-                        if(fallbackConfig != null) {
+                        if (fallbackConfig != null) {
                             configurationDispatcher.notifyChange(key, fallbackConfig);
                         }
                         previouslyDeleted = true;
@@ -203,12 +243,12 @@ public class ConsulConfigurationSource implements ConfigurationSource {
 
             void watch() {
                 kvClient.getValue(parseKeyNameForConsul(fullKey),
-                        QueryOptions.blockSeconds(CONSUL_WATCH_WAIT_SECONDS, index.get()).build(),this);
+                        QueryOptions.blockSeconds(CONSUL_WATCH_WAIT_SECONDS, index.get()).build(), this);
             }
 
             @Override
             public void onFailure(Throwable throwable) {
-                if(throwable instanceof ConnectException) {
+                if (throwable instanceof ConnectException) {
                     try {
                         Thread.sleep(currentRetryDelay);
                     } catch (InterruptedException ignored) {
@@ -216,7 +256,7 @@ public class ConsulConfigurationSource implements ConfigurationSource {
 
                     // exponential increase, limited by maxRetryDelay
                     currentRetryDelay *= 2;
-                    if(currentRetryDelay > maxRetryDelay) {
+                    if (currentRetryDelay > maxRetryDelay) {
                         currentRetryDelay = maxRetryDelay;
                     }
                 } else {

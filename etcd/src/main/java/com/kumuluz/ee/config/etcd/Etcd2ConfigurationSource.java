@@ -21,6 +21,8 @@
 
 package com.kumuluz.ee.config.etcd;
 
+import com.kumuluz.ee.config.utils.InitializationUtils;
+import com.kumuluz.ee.config.utils.ParseUtils;
 import com.kumuluz.ee.configuration.ConfigurationSource;
 import com.kumuluz.ee.configuration.utils.ConfigurationDispatcher;
 import com.kumuluz.ee.configuration.utils.ConfigurationUtil;
@@ -67,19 +69,9 @@ public class Etcd2ConfigurationSource implements ConfigurationSource {
 
         this.configurationDispatcher = configurationDispatcher;
 
-        // get namespace
         ConfigurationUtil configurationUtil = ConfigurationUtil.getInstance();
-        String env = configurationUtil.get("kumuluzee.env").orElse(null);
-        if (env != null && !env.isEmpty()) {
-            this.namespace = "environments." + env + ".services";
-        } else {
-            this.namespace = "environments.dev.services";
-        }
-
-        String etcdNamespace = configurationUtil.get("kumuluzee.config.etcd.namespace").orElse(null);
-        if (etcdNamespace != null && !etcdNamespace.isEmpty()) {
-            this.namespace = etcdNamespace;
-        }
+        // get namespace
+        this.namespace = InitializationUtils.getNamespace(configurationUtil, "etcd");
 
         // get user credentials
         String etcdUsername = configurationUtil.get("kumuluzee.config.etcd.username").orElse(null);
@@ -148,10 +140,8 @@ public class Etcd2ConfigurationSource implements ConfigurationSource {
             etcd.setRetryHandler(new RetryOnce(0));
 
             // get retry dellays
-            startRetryDelay = configurationUtil.getInteger("kumuluzee.config.etcd.start-retry-delay-ms")
-                    .orElse(500);
-            maxRetryDelay = configurationUtil.getInteger("kumuluzee.config.etcd.max-retry-delay-ms")
-                    .orElse(900000);
+            startRetryDelay = InitializationUtils.getStartRetryDelayMs(configurationUtil, "etcd");
+            maxRetryDelay = InitializationUtils.getMaxRetryDelayMs(configurationUtil, "etcd");
 
             log.info("etcd2 configuration source successfully initialised.");
 
@@ -166,13 +156,13 @@ public class Etcd2ConfigurationSource implements ConfigurationSource {
     @Override
     public Optional<String> get(String key) {
 
-        key = namespace + "." + key;
+        key = namespace + "/" + parseKeyNameForEtcd(key);
 
         String value = null;
 
         if (etcd != null) {
             try {
-                value = etcd.get(parseKeyNameForEtcd(key)).send().get().getNode().getValue();
+                value = etcd.get(key).send().get().getNode().getValue();
             } catch (IOException e) {
                 log.severe("IO Exception. Cannot read given key: " + e + " Key: " + key);
             } catch (EtcdException e) {
@@ -195,59 +185,22 @@ public class Etcd2ConfigurationSource implements ConfigurationSource {
 
     @Override
     public Optional<Boolean> getBoolean(String key) {
-
-        Optional<String> value = get(key);
-
-        return value.map(Boolean::valueOf);
+        return ParseUtils.parseOptionalStringToOptionalBoolean(get(key));
     }
 
     @Override
     public Optional<Integer> getInteger(String key) {
-
-        Optional<String> value = get(key);
-
-        if (value.isPresent()) {
-            try {
-                return Optional.of(Integer.valueOf(value.get()));
-            } catch (NumberFormatException e) {
-                return Optional.empty();
-            }
-        } else {
-            return Optional.empty();
-        }
+        return ParseUtils.parseOptionalStringToOptionalInteger(get(key));
     }
 
     @Override
     public Optional<Double> getDouble(String key) {
-
-        Optional<String> value = get(key);
-
-        if (value.isPresent()) {
-            try {
-                return Optional.of(Double.valueOf(value.get()));
-            } catch (NumberFormatException e) {
-                return Optional.empty();
-            }
-        } else {
-            return Optional.empty();
-        }
+        return ParseUtils.parseOptionalStringToOptionalDouble(get(key));
     }
 
     @Override
     public Optional<Float> getFloat(String key) {
-
-        Optional<String> value = get(key);
-
-        if (value.isPresent()) {
-            try {
-                return Optional.of(Float.valueOf(value.get()));
-            } catch (NumberFormatException e) {
-                return Optional.empty();
-            }
-
-        } else {
-            return Optional.empty();
-        }
+        return ParseUtils.parseOptionalStringToOptionalFloat(get(key));
     }
 
 
@@ -296,12 +249,12 @@ public class Etcd2ConfigurationSource implements ConfigurationSource {
 
     public void watch(String key) {
 
-        String fullKey = namespace + "." + key;
+        String fullKey = namespace + "/" + parseKeyNameForEtcd(key);
 
         if (etcd != null) {
             log.info("Initializing watch for key: " + fullKey);
             try {
-                EtcdResponsePromise<EtcdKeysResponse> responsePromise = etcd.get(parseKeyNameForEtcd(fullKey))
+                EtcdResponsePromise<EtcdKeysResponse> responsePromise = etcd.get(fullKey)
                         .setRetryPolicy(new RetryWithExponentialBackOff(startRetryDelay, -1, maxRetryDelay))
                         .waitForChange().send();
 
@@ -321,8 +274,16 @@ public class Etcd2ConfigurationSource implements ConfigurationSource {
                             String value = response.node.value;
                             log.info("Value changed. Key: " + fullKey + " New value: " + value);
 
-                            if (configurationDispatcher != null && value != null) {
-                                configurationDispatcher.notifyChange(key, value);
+                            if (configurationDispatcher != null) {
+                                if(value != null) {
+                                    configurationDispatcher.notifyChange(key, value);
+                                } else {
+                                    ConfigurationUtil  configurationUtil = ConfigurationUtil.getInstance();
+                                    String fallbackConfig = configurationUtil.get(key).orElse(null);
+                                    if(fallbackConfig != null) {
+                                        configurationDispatcher.notifyChange(key, fallbackConfig);
+                                    }
+                                }
                             }
                         }
 

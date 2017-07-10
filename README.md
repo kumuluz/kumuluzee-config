@@ -1,26 +1,27 @@
 # KumuluzEE Config
 [![Build Status](https://img.shields.io/travis/kumuluz/kumuluzee-config/master.svg?style=flat)](https://travis-ci.org/kumuluz/kumuluzee-config)
 
-> Configuration extension for the KumuluzEE microservice framework with support for configuration servers, such as etcd and Consul.
+> Configuration extension for the KumuluzEE microservice framework with support for etcd and Consul configuration 
+servers.
 
 KumuluzEE Config is an open-source configuration management extension for the KumuluzEE framework. It extends basic 
 configuration framework which is a part of KumuluzEE framework, described 
 [here](https://github.com/kumuluz/kumuluzee/wiki/Configuration). It provides support for additional configuration 
 sources in addition to environment variables and configuration files. 
 
-KumuluzEE Config follows the idea of an unified configuration API for the framework, and provides additional
+KumuluzEE Config follows the idea of an unified configuration API for the framework and provides additional
 configuration sources which can be utilised with a standard KumuluzEE configuration interface. 
 
-KumuluzEE Config has been designed to support modularity with plugable configuration sources. Currently etcd &mdash; a 
-highly available distributed key-value store &mdash; is supported to act as a configuration server. Consul Key-Value
-store is also supported.
-In the future, other data stores and configuration servers will be supported too (contributions are welcome).
+KumuluzEE Config has been designed to support modularity with plugable configuration sources. Currently, etcd and 
+Consul key-value stores are supported to act as configuration servers. In the future, other data stores and 
+configuration servers will be supported too (contributions are welcome).
 
 ## Usage
 KumuluzEE defines interfaces for common configuraion management features and two basic configuration sources; 
 environment variables and configuration files. To include configuration sources from this project you need to include a 
-dependency to an implementation library. You can include etcd implementation by adding the 
-following dependency:
+dependency to an implementation library. 
+
+You can include etcd implementation by adding the following dependency:
 
 ```xml
 <dependency>
@@ -32,8 +33,7 @@ following dependency:
 
 Currently, only API v2 is supported. Future releases will support API v3 in a form of a new KumuluzEE Config module.
 
-You can include Consul implementation by adding the 
-following dependency:
+You can include Consul implementation by adding the following dependency:
 
 ```xml
 <dependency>
@@ -60,7 +60,8 @@ have to be defined with configuration key `kumuluzee.config.etcd.ca`.
 
 **Configuring Consul**
 
-KumuluzEE Config Consul automatically connects to the local agent with no additional configuration required.
+By default, KumuluzEE Config Consul automatically connects to the local agent. This behaviour can be overridden by 
+specifying agent URL with configuration key `kumuluzee.config.consul.agent`.
 
 **Configuration source priorities**
 
@@ -146,7 +147,7 @@ public class ConfigPropertiesExample {
 Subscribing to key changes is done with an instance of `ConfigurationUtil` class. Example:
 
 ```java
-String watchedKey = "test-service.config.maintenance";
+String watchedKey = "maintenance";
 
 ConfigurationUtil.getInstance().subscribe(watchedKey, (String key, String value) -> {
 

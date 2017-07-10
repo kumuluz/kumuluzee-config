@@ -60,8 +60,8 @@ have to be defined with configuration key `kumuluzee.config.etcd.ca`.
 
 **Configuring Consul**
 
-By default, KumuluzEE Config Consul automatically connects to the local agent. This behaviour can be overridden by 
-specifying agent URL with configuration key `kumuluzee.config.consul.agent`.
+By default, KumuluzEE Config Consul automatically connects to the local agent at http://localhost:8500. This behaviour 
+can be overridden by specifying agent URL with configuration key `kumuluzee.config.consul.agent`.
 
 **Configuration source priorities**
 

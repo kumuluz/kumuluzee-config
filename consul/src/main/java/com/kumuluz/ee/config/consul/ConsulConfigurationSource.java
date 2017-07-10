@@ -73,6 +73,7 @@ public class ConsulConfigurationSource implements ConfigurationSource {
         ConfigurationUtil configurationUtil = ConfigurationUtil.getInstance();
 
         this.namespace = InitializationUtils.getNamespace(configurationUtil, "consul");
+        log.info("Using namespace: " + this.namespace);
 
         // get retry delays
         startRetryDelay = InitializationUtils.getStartRetryDelayMs(configurationUtil, "consul");

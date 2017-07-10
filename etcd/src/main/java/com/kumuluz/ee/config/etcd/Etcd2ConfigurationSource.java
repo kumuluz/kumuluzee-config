@@ -72,6 +72,7 @@ public class Etcd2ConfigurationSource implements ConfigurationSource {
         ConfigurationUtil configurationUtil = ConfigurationUtil.getInstance();
         // get namespace
         this.namespace = InitializationUtils.getNamespace(configurationUtil, "etcd");
+        log.info("Using namespace: " + this.namespace);
 
         // get user credentials
         String etcdUsername = configurationUtil.get("kumuluzee.config.etcd.username").orElse(null);
@@ -275,12 +276,12 @@ public class Etcd2ConfigurationSource implements ConfigurationSource {
                             log.info("Value changed. Key: " + fullKey + " New value: " + value);
 
                             if (configurationDispatcher != null) {
-                                if(value != null) {
+                                if (value != null) {
                                     configurationDispatcher.notifyChange(key, value);
                                 } else {
-                                    ConfigurationUtil  configurationUtil = ConfigurationUtil.getInstance();
+                                    ConfigurationUtil configurationUtil = ConfigurationUtil.getInstance();
                                     String fallbackConfig = configurationUtil.get(key).orElse(null);
-                                    if(fallbackConfig != null) {
+                                    if (fallbackConfig != null) {
                                         configurationDispatcher.notifyChange(key, fallbackConfig);
                                     }
                                 }

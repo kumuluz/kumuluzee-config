@@ -157,13 +157,13 @@ public class Etcd2ConfigurationSource implements ConfigurationSource {
     @Override
     public Optional<String> get(String key) {
 
-        key = namespace + "." + key;
+        key = namespace + "/" + parseKeyNameForEtcd(key);
 
         String value = null;
 
         if (etcd != null) {
             try {
-                value = etcd.get(parseKeyNameForEtcd(key)).send().get().getNode().getValue();
+                value = etcd.get(key).send().get().getNode().getValue();
             } catch (IOException e) {
                 log.severe("IO Exception. Cannot read given key: " + e + " Key: " + key);
             } catch (EtcdException e) {
@@ -212,12 +212,12 @@ public class Etcd2ConfigurationSource implements ConfigurationSource {
 
     public void watch(String key) {
 
-        String fullKey = namespace + "." + key;
+        String fullKey = namespace + "/" + parseKeyNameForEtcd(key);
 
         if (etcd != null) {
             log.info("Initializing watch for key: " + fullKey);
             try {
-                EtcdResponsePromise<EtcdKeysResponse> responsePromise = etcd.get(parseKeyNameForEtcd(fullKey))
+                EtcdResponsePromise<EtcdKeysResponse> responsePromise = etcd.get(fullKey)
                         .setRetryPolicy(new RetryWithExponentialBackOff(startRetryDelay, -1, maxRetryDelay))
                         .waitForChange().send();
 

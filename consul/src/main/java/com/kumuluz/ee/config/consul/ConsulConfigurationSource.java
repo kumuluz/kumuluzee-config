@@ -124,13 +124,12 @@ public class ConsulConfigurationSource implements ConfigurationSource {
     @Override
     public Optional<String> get(@Nonnull String key) {
 
-        key = this.namespace + "." + key;
+        key = this.namespace + "/" + parseKeyNameForConsul(key);
 
         Optional<String> value = Optional.empty();
 
         try {
-            value = kvClient.getValueAsString(parseKeyNameForConsul(key)).transform(java.util.Optional::of).or(java.util
-                    .Optional.empty());
+            value = kvClient.getValueAsString(key).transform(java.util.Optional::of).or(java.util.Optional.empty());
         } catch (ConsulException e) {
             log.severe("Consul exception: " + e.getLocalizedMessage());
         }
@@ -167,12 +166,12 @@ public class ConsulConfigurationSource implements ConfigurationSource {
     @Override
     public Optional<List<String>> getMapKeys(String key) {
 
-        key = this.namespace + "." + key;
+        key = this.namespace + "/" + parseKeyNameForConsul(key);
 
         Set<String> mapKeys = new HashSet();
 
         try {
-            for (String mapKey : kvClient.getKeys(parseKeyNameForConsul(key))) {
+            for (String mapKey : kvClient.getKeys(key)) {
                 String[] splittedKey = mapKey.split("/");
                 mapKeys.add(splittedKey[splittedKey.length - 1]);
             }
@@ -190,9 +189,9 @@ public class ConsulConfigurationSource implements ConfigurationSource {
     @Override
     public void watch(String key) {
 
-        String fullKey = this.namespace + "." + key;
+        String fullKey = this.namespace + "/" + parseKeyNameForConsul(key);
 
-        log.info("Initializing watch for key: " + parseKeyNameForConsul(fullKey));
+        log.info("Initializing watch for key: " + fullKey);
 
         ConsulResponseCallback<com.google.common.base.Optional<Value>> callback = new ConsulResponseCallback<com
                 .google.common.base.Optional<Value>>() {
@@ -218,14 +217,14 @@ public class ConsulConfigurationSource implements ConfigurationSource {
                         com.google.common.base.Optional<String> valueOpt = v.getValueAsString();
 
                         if (valueOpt.isPresent() && configurationDispatcher != null) {
-                            log.info("Consul watch callback for key " + parseKeyNameForConsul(fullKey) +
+                            log.info("Consul watch callback for key " + fullKey +
                                     " invoked. " + "New value: " + valueOpt.get());
                             configurationDispatcher.notifyChange(key, valueOpt.get());
                             previouslyDeleted = false;
                         }
 
                     } else if (!previouslyDeleted) {
-                        log.info("Consul watch callback for key " + parseKeyNameForConsul(fullKey) +
+                        log.info("Consul watch callback for key " + fullKey +
                                 " invoked. No value present, fallback to other configuration sources.");
                         ConfigurationUtil configurationUtil = ConfigurationUtil.getInstance();
                         String fallbackConfig = configurationUtil.get(key).orElse(null);
@@ -242,8 +241,8 @@ public class ConsulConfigurationSource implements ConfigurationSource {
             }
 
             void watch() {
-                kvClient.getValue(parseKeyNameForConsul(fullKey),
-                        QueryOptions.blockSeconds(CONSUL_WATCH_WAIT_SECONDS, index.get()).build(), this);
+                kvClient.getValue(fullKey, QueryOptions.blockSeconds(CONSUL_WATCH_WAIT_SECONDS, index.get()).build(),
+                        this);
             }
 
             @Override
@@ -267,8 +266,8 @@ public class ConsulConfigurationSource implements ConfigurationSource {
             }
         };
 
-        kvClient.getValue(parseKeyNameForConsul(fullKey),
-                QueryOptions.blockSeconds(CONSUL_WATCH_WAIT_SECONDS, new BigInteger("0")).build(), callback);
+        kvClient.getValue(fullKey, QueryOptions.blockSeconds(CONSUL_WATCH_WAIT_SECONDS, new BigInteger("0")).build(),
+                callback);
 
     }
 

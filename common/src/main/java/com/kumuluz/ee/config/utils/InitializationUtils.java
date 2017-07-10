@@ -33,17 +33,24 @@ import java.util.Optional;
 public class InitializationUtils {
 
     public static String getNamespace(ConfigurationUtil configurationUtil, String implementation) {
+        String universalNamespace = configurationUtil.get("kumuluzee.config.namespace")
+                .orElse(null);
+        if (universalNamespace != null && !universalNamespace.isEmpty()) {
+            return universalNamespace;
+        }
         String implementationNamespace = configurationUtil.get("kumuluzee.config." + implementation + ".namespace")
                 .orElse(null);
         if (implementationNamespace != null && !implementationNamespace.isEmpty()) {
             return implementationNamespace;
         }
 
-        String env = configurationUtil.get("kumuluzee.env").orElse(null);
-        if (env != null && !env.isEmpty()) {
-            return "environments." + env + ".services";
+        String env = configurationUtil.get("kumuluzee.env").orElse("dev");
+        String serviceName = configurationUtil.get("kumuluzee.service-name").orElse(null);
+        if(serviceName != null && !serviceName.isEmpty()) {
+            String serviceVersion = configurationUtil.get("kumuluzee.version").orElse("1.0.0");
+            return "environments/" + env + "/services/" + serviceName + "/" + serviceVersion + "/config";
         } else {
-            return "environments.dev.services";
+            return "environments/" + env + "/services/config";
         }
     }
 

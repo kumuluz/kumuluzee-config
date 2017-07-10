@@ -76,9 +76,12 @@ Key names are automatically parsed from KumuluzEE to etcd format (e.g. `environm
 `environments/dev/name`).
 
 Configuration properties are in etcd stored in a dedicated namespace, which is automatically generated from 
-configuration key `kumuluzee.env`. Example: `kumuluzee.env: dev` is mapped to namespace 
-`environments.dev.services`. Automatic namespace generation can be overwritten with key 
-`kumuluzee.config.etcd.namespace`. Example: `kumuluzee.config.etcd.namespace: environments.dev.service`. 
+configuration keys `kumuluzee.env`, `kumuluzee.service-name` and `kumuluzee.version`. Example: `kumuluzee.env: dev`,
+`kumuluzee.service-name: customer-service`, `kumuluzee.version: 1.2.3` is
+mapped to namespace `environments/dev/services/customer-service/1.2.3/config`. If `kumuluzee.env` or `kumuluzee.version`
+keys are not specified, defaults are used (`dev` and `1.0.0`). If `kumuluzee.service-name` is not specified, namespace
+`environments/<environment>/services/config` is used. Automatic namespace generation can be overwritten with key 
+`kumuluzee.config.namespace`. Example: `kumuluzee.config.namespace: environments/dev/services/config`. 
 
 Namespace is used as a first part of the key used for etcd key/value store. Example: with set `kumuluzee.env: dev`, 
 field `port` from example bellow is in etcd stored in key `/environments/dev/services/test-service/config/port`.

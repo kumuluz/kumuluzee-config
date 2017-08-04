@@ -41,7 +41,9 @@ import mousio.etcd4j.responses.EtcdKeysResponse;
 import javax.net.ssl.SSLException;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
+import java.io.UnsupportedEncodingException;
 import java.net.URI;
+import java.net.URLEncoder;
 import java.security.cert.CertificateException;
 import java.security.cert.CertificateFactory;
 import java.security.cert.X509Certificate;
@@ -340,7 +342,18 @@ public class Etcd2ConfigurationSource implements ConfigurationSource {
 
     private String parseKeyNameForEtcd(String key) {
 
-        return key.replaceAll("\\.", "/");
+        String[] splittedKey = key.split("\\.");
+
+        StringBuilder parsedKey = new StringBuilder();
+        for(String s : splittedKey) {
+            try {
+                parsedKey.append(URLEncoder.encode(s, "UTF-8")).append("/");
+            } catch (UnsupportedEncodingException e) {
+                log.severe("UTF-8 encoding not supported.");
+            }
+        }
+
+        return parsedKey.deleteCharAt(parsedKey.length() - 1).toString();
 
     }
 

@@ -20,6 +20,7 @@
 */
 package com.kumuluz.ee.config.consul;
 
+import com.kumuluz.ee.common.config.EeConfig;
 import com.kumuluz.ee.config.utils.InitializationUtils;
 import com.kumuluz.ee.config.utils.ParseUtils;
 import com.kumuluz.ee.configuration.ConfigurationSource;
@@ -66,13 +67,19 @@ public class ConsulConfigurationSource implements ConfigurationSource {
     private int startRetryDelay;
     private int maxRetryDelay;
 
+    private EeConfig eeConfig;
+
+    public ConsulConfigurationSource(EeConfig eeConfig) {
+        this.eeConfig = eeConfig;
+    }
+
 
     @Override
     public void init(ConfigurationDispatcher configurationDispatcher) {
 
         ConfigurationUtil configurationUtil = ConfigurationUtil.getInstance();
 
-        this.namespace = InitializationUtils.getNamespace(configurationUtil, "consul");
+        this.namespace = InitializationUtils.getNamespace(this.eeConfig, configurationUtil, "consul");
         log.info("Using namespace: " + this.namespace);
 
         // get retry delays

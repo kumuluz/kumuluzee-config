@@ -80,7 +80,7 @@ Configuration properties are in etcd stored in a dedicated namespace, which is a
 configuration keys `kumuluzee.env.name`, `kumuluzee.name` and `kumuluzee.version`. Example: `kumuluzee.env.name: dev`,
 `kumuluzee.name: customer-service`, `kumuluzee.version: 1.2.3` is
 mapped to namespace `environments/dev/services/customer-service/1.2.3/config`. If `kumuluzee.env.name` or
-`kumuluzee.version` keys are not specified, defaults are used (`dev` and `1.0.0`). If `kumuluzee.service-name` is not
+`kumuluzee.version` keys are not specified, defaults are used (`dev` and `1.0.0`). If `kumuluzee.name` is not
 specified, namespace `environments/<environment>/services/config` is used. Automatic namespace generation can be
 overwritten with key `kumuluzee.config.namespace`. Example:
 `kumuluzee.config.namespace: environments/dev/services/config`.

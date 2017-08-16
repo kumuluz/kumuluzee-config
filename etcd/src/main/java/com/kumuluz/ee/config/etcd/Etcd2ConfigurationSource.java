@@ -195,6 +195,11 @@ public class Etcd2ConfigurationSource implements ConfigurationSource {
     }
 
     @Override
+    public Optional<Long> getLong(String key) {
+        return ParseUtils.parseOptionalStringToOptionalLong(get(key));
+    }
+
+    @Override
     public Optional<Double> getDouble(String key) {
         return ParseUtils.parseOptionalStringToOptionalDouble(get(key));
     }

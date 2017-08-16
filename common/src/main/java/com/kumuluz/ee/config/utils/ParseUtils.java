@@ -46,6 +46,18 @@ public class ParseUtils {
         }
     }
 
+    public static Optional<Long> parseOptionalStringToOptionalLong(Optional<String> optString) {
+        if (optString.isPresent()) {
+            try {
+                return Optional.of(Long.valueOf(optString.get()));
+            } catch (NumberFormatException e) {
+                return Optional.empty();
+            }
+        } else {
+            return Optional.empty();
+        }
+    }
+
     public static Optional<Double> parseOptionalStringToOptionalDouble(Optional<String> optString) {
         if (optString.isPresent()) {
             try {

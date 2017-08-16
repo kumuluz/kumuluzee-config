@@ -150,6 +150,11 @@ public class ConsulConfigurationSource implements ConfigurationSource {
     }
 
     @Override
+    public Optional<Long> getLong(@Nonnull String key) {
+        return ParseUtils.parseOptionalStringToOptionalLong(get(key));
+    }
+
+    @Override
     public Optional<Double> getDouble(@Nonnull String key) {
         return ParseUtils.parseOptionalStringToOptionalDouble(get(key));
     }

@@ -21,6 +21,7 @@
 
 package com.kumuluz.ee.config.etcd;
 
+import com.kumuluz.ee.common.config.EeConfig;
 import com.kumuluz.ee.config.utils.InitializationUtils;
 import com.kumuluz.ee.config.utils.ParseUtils;
 import com.kumuluz.ee.configuration.ConfigurationSource;
@@ -64,6 +65,12 @@ public class Etcd2ConfigurationSource implements ConfigurationSource {
     private int startRetryDelay;
     private int maxRetryDelay;
 
+    private EeConfig eeConfig;
+
+    public Etcd2ConfigurationSource(EeConfig eeConfig) {
+        this.eeConfig = eeConfig;
+    }
+
     @Override
     public void init(ConfigurationDispatcher configurationDispatcher) {
 
@@ -71,7 +78,7 @@ public class Etcd2ConfigurationSource implements ConfigurationSource {
 
         ConfigurationUtil configurationUtil = ConfigurationUtil.getInstance();
         // get namespace
-        this.namespace = InitializationUtils.getNamespace(configurationUtil, "etcd");
+        this.namespace = InitializationUtils.getNamespace(eeConfig, configurationUtil, "etcd");
         log.info("Using namespace: " + this.namespace);
 
         // get user credentials

@@ -21,6 +21,7 @@
 
 package com.kumuluz.ee.config.utils;
 
+import com.kumuluz.ee.common.config.EeConfig;
 import com.kumuluz.ee.configuration.utils.ConfigurationUtil;
 
 import java.util.Optional;
@@ -32,7 +33,7 @@ import java.util.Optional;
  */
 public class InitializationUtils {
 
-    public static String getNamespace(ConfigurationUtil configurationUtil, String implementation) {
+    public static String getNamespace(EeConfig eeConfig, ConfigurationUtil configurationUtil, String implementation) {
         String universalNamespace = configurationUtil.get("kumuluzee.config.namespace")
                 .orElse(null);
         if (universalNamespace != null && !universalNamespace.isEmpty()) {
@@ -44,10 +45,21 @@ public class InitializationUtils {
             return implementationNamespace;
         }
 
-        String env = configurationUtil.get("kumuluzee.env").orElse("dev");
-        String serviceName = configurationUtil.get("kumuluzee.service-name").orElse(null);
+        String env = eeConfig.getEnv().getName();
+        if(env == null || env.isEmpty()) {
+            env = configurationUtil.get("kumuluzee.env").orElse("dev");
+        }
+
+        String serviceName = eeConfig.getName();
+        if(serviceName == null || serviceName.isEmpty()) {
+            serviceName = configurationUtil.get("kumuluzee.service-name").orElse(null);
+        }
+
         if(serviceName != null && !serviceName.isEmpty()) {
-            String serviceVersion = configurationUtil.get("kumuluzee.version").orElse("1.0.0");
+            String serviceVersion = eeConfig.getVersion();
+            if(serviceVersion == null || serviceVersion.isEmpty()) {
+                serviceVersion = configurationUtil.get("kumuluzee.version").orElse("1.0.0");
+            }
             return "environments/" + env + "/services/" + serviceName + "/" + serviceVersion + "/config";
         } else {
             return "environments/" + env + "/services/config";

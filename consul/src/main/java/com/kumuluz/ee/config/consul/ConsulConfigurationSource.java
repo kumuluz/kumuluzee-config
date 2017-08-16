@@ -26,6 +26,8 @@ import com.kumuluz.ee.config.utils.ParseUtils;
 import com.kumuluz.ee.configuration.ConfigurationSource;
 import com.kumuluz.ee.configuration.utils.ConfigurationDispatcher;
 import com.kumuluz.ee.configuration.utils.ConfigurationUtil;
+import com.kumuluz.ee.logs.LogManager;
+import com.kumuluz.ee.logs.Logger;
 import com.orbitz.consul.Consul;
 import com.orbitz.consul.ConsulException;
 import com.orbitz.consul.KeyValueClient;
@@ -41,7 +43,6 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicReference;
-import java.util.logging.Logger;
 
 /**
  * Util class for getting and setting configuration properties for Consul Key-Value store.
@@ -50,7 +51,7 @@ import java.util.logging.Logger;
  */
 public class ConsulConfigurationSource implements ConfigurationSource {
 
-    private static final Logger log = Logger.getLogger(ConsulConfigurationSource.class.getName());
+    private static final Logger log = LogManager.getLogger(ConsulConfigurationSource.class.getName());
 
     // Specifies wait parameter, passed to Consul when initializing watches.
     // Consul ends connection (sends current state), when wait time is reached.
@@ -93,7 +94,7 @@ public class ConsulConfigurationSource implements ConfigurationSource {
             consulAgentUrl = new URL(configurationUtil.get("kumuluzee.config.consul.agent").orElse
                     ("http://localhost:8500"));
         } catch (MalformedURLException e) {
-            log.warning("Provided Consul Agent URL is not valid. Defaulting to http://localhost:8500");
+            log.warn("Provided Consul Agent URL is not valid. Defaulting to http://localhost:8500");
             try {
                 consulAgentUrl = new URL("http://localhost:8500");
             } catch (MalformedURLException e1) {
@@ -116,7 +117,7 @@ public class ConsulConfigurationSource implements ConfigurationSource {
             consul.agentClient().ping();
             pingSuccessful = true;
         } catch (ConsulException e) {
-            log.severe("Cannot ping Consul agent: " + e.getLocalizedMessage());
+            log.error("Cannot ping Consul agent.", e);
         }
 
         kvClient = consul.keyValueClient();
@@ -124,7 +125,7 @@ public class ConsulConfigurationSource implements ConfigurationSource {
         if (pingSuccessful) {
             log.info("Consul configuration source successfully initialised.");
         } else {
-            log.warning("Consul configuration source initialized, but Consul agent inaccessible. " +
+            log.warn("Consul configuration source initialized, but Consul agent inaccessible. " +
                     "Configuration source may not work as expected.");
         }
     }
@@ -139,7 +140,7 @@ public class ConsulConfigurationSource implements ConfigurationSource {
         try {
             value = kvClient.getValueAsString(key).transform(java.util.Optional::of).or(java.util.Optional.empty());
         } catch (ConsulException e) {
-            log.severe("Consul exception: " + e.getLocalizedMessage());
+            log.error("Consul exception.", e);
         }
 
         return value;
@@ -189,7 +190,7 @@ public class ConsulConfigurationSource implements ConfigurationSource {
                 mapKeys.add(splittedKey[splittedKey.length - 1]);
             }
         } catch (ConsulException e) {
-            log.severe("Consul exception: " + e.getLocalizedMessage());
+            log.error("Consul exception.", e);
         }
 
         if (mapKeys != null && !mapKeys.isEmpty()) {
@@ -272,7 +273,7 @@ public class ConsulConfigurationSource implements ConfigurationSource {
                         currentRetryDelay = maxRetryDelay;
                     }
                 } else {
-                    log.severe("Watch error: " + throwable.getLocalizedMessage());
+                    log.error("Watch error.", throwable);
                 }
 
                 watch();

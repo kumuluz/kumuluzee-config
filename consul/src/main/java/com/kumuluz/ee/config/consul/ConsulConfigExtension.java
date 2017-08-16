@@ -26,8 +26,8 @@ import com.kumuluz.ee.common.dependencies.EeExtensionDef;
 import com.kumuluz.ee.common.dependencies.EeExtensionType;
 import com.kumuluz.ee.common.wrapper.KumuluzServerWrapper;
 import com.kumuluz.ee.configuration.ConfigurationSource;
-
-import java.util.logging.Logger;
+import com.kumuluz.ee.logs.LogManager;
+import com.kumuluz.ee.logs.Logger;
 
 /**
  * KumuluzEE framework extension for adding Consul configuration source in configuration util.
@@ -37,7 +37,7 @@ import java.util.logging.Logger;
 @EeExtensionDef(name = "Consul", type = EeExtensionType.CONFIG)
 public class ConsulConfigExtension implements ConfigExtension {
 
-    private static final Logger log = Logger.getLogger(ConsulConfigExtension.class.getName());
+    private static final Logger log = LogManager.getLogger(ConsulConfigExtension.class.getName());
 
     private ConfigurationSource configurationSource;
 

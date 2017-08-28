@@ -23,7 +23,7 @@ package com.kumuluz.ee.config.consul;
 import com.kumuluz.ee.common.ConfigExtension;
 import com.kumuluz.ee.common.config.EeConfig;
 import com.kumuluz.ee.common.dependencies.EeExtensionDef;
-import com.kumuluz.ee.common.dependencies.EeExtensionType;
+import com.kumuluz.ee.common.dependencies.EeExtensionGroup;
 import com.kumuluz.ee.common.wrapper.KumuluzServerWrapper;
 import com.kumuluz.ee.configuration.ConfigurationSource;
 
@@ -34,7 +34,7 @@ import java.util.logging.Logger;
  *
  * @author Jan Meznarič, Urban Malc
  */
-@EeExtensionDef(name = "Consul", type = EeExtensionType.CONFIG)
+@EeExtensionDef(name = "Consul", group = EeExtensionGroup.CONFIG)
 public class ConsulConfigExtension implements ConfigExtension {
 
     private static final Logger log = Logger.getLogger(ConsulConfigExtension.class.getName());

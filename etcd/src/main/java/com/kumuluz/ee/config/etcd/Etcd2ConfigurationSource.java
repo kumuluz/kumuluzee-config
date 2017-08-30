@@ -245,8 +245,7 @@ public class Etcd2ConfigurationSource implements ConfigurationSource {
                 for (EtcdKeysResponse.EtcdNode n : node.getNodes()) {
                     String nodeKey = n.getKey();
                     try {
-                        arrayIndexes.add(Integer.parseInt(nodeKey.substring(nodeKey.length() - 2, nodeKey.length() -
-                                1)));
+                        arrayIndexes.add(Integer.parseInt(nodeKey.substring(key.length() + 3, key.length() + 4)));
 
                     } catch (NumberFormatException e) {
                     }

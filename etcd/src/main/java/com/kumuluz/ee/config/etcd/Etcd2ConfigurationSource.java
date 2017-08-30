@@ -269,7 +269,7 @@ public class Etcd2ConfigurationSource implements ConfigurationSource {
         if (etcd != null) {
             log.info("Initializing watch for key: " + fullKey);
             try {
-                EtcdResponsePromise<EtcdKeysResponse> responsePromise = etcd.get(fullKey)
+                EtcdResponsePromise<EtcdKeysResponse> responsePromise = etcd.getDir(fullKey).recursive()
                         .setRetryPolicy(new RetryWithExponentialBackOff(startRetryDelay, -1, maxRetryDelay))
                         .waitForChange().send();
 
@@ -286,12 +286,13 @@ public class Etcd2ConfigurationSource implements ConfigurationSource {
                     try {
                         response = promise.get();
                         if (response != null) {
-                            String value = response.node.value;
-                            log.info("Value changed. Key: " + fullKey + " New value: " + value);
+                            String newValue = response.node.value;
+                            String newKey = response.node.key;
+                            log.info("Value changed. Key: " + parseKeyNameFromEtcd(newKey) + " New value: " + newValue);
 
                             if (configurationDispatcher != null) {
-                                if (value != null) {
-                                    configurationDispatcher.notifyChange(key, value);
+                                if (newValue != null) {
+                                    configurationDispatcher.notifyChange(parseKeyNameFromEtcd(newKey), newValue);
                                 } else {
                                     ConfigurationUtil configurationUtil = ConfigurationUtil.getInstance();
                                     String fallbackConfig = configurationUtil.get(key).orElse(null);
@@ -354,10 +355,11 @@ public class Etcd2ConfigurationSource implements ConfigurationSource {
 
     private String parseKeyNameForEtcd(String key) {
 
+        key = key.replace("[", ".[");
         String[] splittedKey = key.split("\\.");
 
         StringBuilder parsedKey = new StringBuilder();
-        for(String s : splittedKey) {
+        for (String s : splittedKey) {
             try {
                 parsedKey.append(URLEncoder.encode(s, "UTF-8")).append("/");
             } catch (UnsupportedEncodingException e) {
@@ -367,6 +369,10 @@ public class Etcd2ConfigurationSource implements ConfigurationSource {
 
         return parsedKey.deleteCharAt(parsedKey.length() - 1).toString();
 
+    }
+
+    private String parseKeyNameFromEtcd(String key) {
+        return key.substring(this.namespace.length() + 2).replace("/", ".");
     }
 
     public String getNamespace() {

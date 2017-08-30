@@ -422,7 +422,7 @@ public class Etcd2ConfigurationSource implements ConfigurationSource {
     }
 
     private String parseKeyNameFromEtcd(String key) {
-        return key.substring(this.namespace.length() + 2).replace("/", ".");
+        return key.substring(this.namespace.length() + 2).replace("/", ".").replace(".[", "[");
     }
 
     public String getNamespace() {

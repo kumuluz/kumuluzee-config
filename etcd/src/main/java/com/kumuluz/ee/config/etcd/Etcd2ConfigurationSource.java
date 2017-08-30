@@ -344,7 +344,8 @@ public class Etcd2ConfigurationSource implements ConfigurationSource {
                                     configurationDispatcher.notifyChange(parseKeyNameFromEtcd(newKey), newValue);
                                 } else {
                                     ConfigurationUtil configurationUtil = ConfigurationUtil.getInstance();
-                                    String fallbackConfig = configurationUtil.get(key).orElse(null);
+                                    String fallbackConfig = configurationUtil.get(parseKeyNameFromEtcd(newKey))
+                                            .orElse(null);
                                     if (fallbackConfig != null) {
                                         configurationDispatcher.notifyChange(key, fallbackConfig);
                                     }

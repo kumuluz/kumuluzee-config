@@ -173,7 +173,48 @@ public class ConsulConfigurationSource implements ConfigurationSource {
 
     @Override
     public Optional<Integer> getListSize(String key) {
+
+        // get directory
+        key = namespace + "/" + parseKeyNameForConsul(key);
+        List<Value> values = null;
+
+        try {
+            values = kvClient.getValues(key);
+        } catch (ConsulException e) {
+            log.severe("Consul exception: " + e.getLocalizedMessage());
+        }
+
+        if (values != null && !values.isEmpty()) {
+            // get array indexes
+            List<Integer> arrayIndexes = new ArrayList<>();
+            for (Value v : values) {
+                String nodeKey = v.getKey();
+                try {
+                    arrayIndexes.add(Integer.parseInt(nodeKey.substring(key.length() + 2, nodeKey.length() - 1)));
+                } catch (NumberFormatException e) {
+                }
+
+            }
+            Collections.sort(arrayIndexes);
+
+            // check if indexes represent an array (are continuous)
+            int listSize = 0;
+            for (Integer i : arrayIndexes) {
+                if (i == listSize) {
+                    listSize += 1;
+                } else {
+                    break;
+                }
+            }
+
+            if (listSize > 0) {
+                return Optional.of(listSize);
+            }
+        }
+
+
         return Optional.empty();
+
     }
 
     @Override
@@ -206,8 +247,7 @@ public class ConsulConfigurationSource implements ConfigurationSource {
 
         log.info("Initializing watch for key: " + fullKey);
 
-        ConsulResponseCallback<com.google.common.base.Optional<Value>> callback = new ConsulResponseCallback<com
-                .google.common.base.Optional<Value>>() {
+        ConsulResponseCallback<List<Value>> callback = new ConsulResponseCallback<List<Value>>() {
 
             AtomicReference<BigInteger> index = new AtomicReference<>(new BigInteger("0"));
 
@@ -218,24 +258,35 @@ public class ConsulConfigurationSource implements ConfigurationSource {
             boolean previouslyDeleted = false;
 
             @Override
-            public void onComplete(ConsulResponse<com.google.common.base.Optional<Value>> consulResponse) {
+            public void onComplete(ConsulResponse<List<Value>> consulResponse) {
                 // successful request, reset delay
                 currentRetryDelay = startRetryDelay;
 
                 if (index.get() != null && !index.get().equals(consulResponse.getIndex())) {
-                    if (consulResponse.getResponse().isPresent()) {
+                    if (consulResponse.getResponse() != null && !consulResponse.getResponse().isEmpty()) {
 
-                        Value v = consulResponse.getResponse().get();
+                        for (Value v : consulResponse.getResponse()) {
 
-                        com.google.common.base.Optional<String> valueOpt = v.getValueAsString();
+                            com.google.common.base.Optional<String> valueOpt = v.getValueAsString();
+                            String newKey = v.getKey();
 
-                        if (valueOpt.isPresent() && configurationDispatcher != null) {
-                            log.info("Consul watch callback for key " + fullKey +
-                                    " invoked. " + "New value: " + valueOpt.get());
-                            configurationDispatcher.notifyChange(key, valueOpt.get());
-                            previouslyDeleted = false;
+                            if (valueOpt.isPresent() && configurationDispatcher != null) {
+                                log.info("Consul watch callback for key " + parseKeyNameFromConsul(newKey) +
+                                        " invoked. " + "New value: " + valueOpt.get());
+                                configurationDispatcher.notifyChange(parseKeyNameFromConsul(newKey), valueOpt.get());
+                                previouslyDeleted = false;
+                            } else {
+                                log.info("Consul watch callback for key " + parseKeyNameFromConsul(newKey) +
+                                        " invoked. No value present, fallback to other configuration sources.");
+                                ConfigurationUtil configurationUtil = ConfigurationUtil.getInstance();
+                                String fallbackConfig = configurationUtil.get(parseKeyNameFromConsul(newKey)).orElse
+                                        (null);
+                                if (fallbackConfig != null) {
+                                    configurationDispatcher.notifyChange(parseKeyNameFromConsul(newKey),
+                                            fallbackConfig);
+                                }
+                            }
                         }
-
                     } else if (!previouslyDeleted) {
                         log.info("Consul watch callback for key " + fullKey +
                                 " invoked. No value present, fallback to other configuration sources.");
@@ -254,7 +305,7 @@ public class ConsulConfigurationSource implements ConfigurationSource {
             }
 
             void watch() {
-                kvClient.getValue(fullKey, QueryOptions.blockSeconds(CONSUL_WATCH_WAIT_SECONDS, index.get()).build(),
+                kvClient.getValues(fullKey, QueryOptions.blockSeconds(CONSUL_WATCH_WAIT_SECONDS, index.get()).build(),
                         this);
             }
 
@@ -279,8 +330,9 @@ public class ConsulConfigurationSource implements ConfigurationSource {
             }
         };
 
-        kvClient.getValue(fullKey, QueryOptions.blockSeconds(CONSUL_WATCH_WAIT_SECONDS, new BigInteger("0")).build(),
+        kvClient.getValues(fullKey, QueryOptions.blockSeconds(CONSUL_WATCH_WAIT_SECONDS, new BigInteger("0")).build(),
                 callback);
+
 
     }
 
@@ -309,9 +361,13 @@ public class ConsulConfigurationSource implements ConfigurationSource {
         set(key, value.toString());
     }
 
+    private String parseKeyNameFromConsul(String key) {
+        return key.substring(this.namespace.length() + 1).replace("/", ".").replace(".[", "[");
+    }
+
     private String parseKeyNameForConsul(String key) {
 
-        return key.replaceAll("\\.", "/");
+        return key.replace("[", ".[").replace(".", "/");
 
     }
 }

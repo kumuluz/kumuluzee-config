@@ -221,7 +221,55 @@ public class Etcd2ConfigurationSource implements ConfigurationSource {
 
     @Override
     public Optional<Integer> getListSize(String key) {
+
+        // get directory
+        key = namespace + "/" + parseKeyNameForEtcd(key);
+        EtcdKeysResponse.EtcdNode node = null;
+
+        if (etcd != null) {
+            try {
+                node = etcd.getDir(key).send().get().getNode();
+            } catch (IOException e) {
+                log.severe("IO Exception. Cannot read given key: " + e + " Key: " + key);
+            } catch (EtcdException e) {
+                log.info("etcd: " + e + " Key: " + key);
+            } catch (EtcdAuthenticationException e) {
+                log.severe("Etcd authentication exception. Cannot read given key: " + e + " Key: " + key);
+            } catch (TimeoutException e) {
+                log.severe("Timeout exception. Cannot read given key time: " + e + " Key: " + key);
+            }
+
+            if (node != null) {
+                // get array indexes
+                List<Integer> arrayIndexes = new ArrayList<>();
+                for (EtcdKeysResponse.EtcdNode n : node.getNodes()) {
+                    String nodeKey = n.getKey();
+                    try {
+                        arrayIndexes.add(Integer.parseInt(nodeKey.substring(key.length() + 3, nodeKey.length() - 1)));
+                    } catch (NumberFormatException e) {
+                    }
+
+                }
+                Collections.sort(arrayIndexes);
+
+                // check if indexes represent an array (are continuous)
+                int listSize = 0;
+                for (Integer i : arrayIndexes) {
+                    if (i == listSize) {
+                        listSize += 1;
+                    } else {
+                        break;
+                    }
+                }
+
+                if (listSize > 0) {
+                    return Optional.of(listSize);
+                }
+            }
+        }
+
         return Optional.empty();
+
     }
 
     @Override
@@ -269,7 +317,7 @@ public class Etcd2ConfigurationSource implements ConfigurationSource {
         if (etcd != null) {
             log.info("Initializing watch for key: " + fullKey);
             try {
-                EtcdResponsePromise<EtcdKeysResponse> responsePromise = etcd.get(fullKey)
+                EtcdResponsePromise<EtcdKeysResponse> responsePromise = etcd.getDir(fullKey).recursive()
                         .setRetryPolicy(new RetryWithExponentialBackOff(startRetryDelay, -1, maxRetryDelay))
                         .waitForChange().send();
 
@@ -286,15 +334,17 @@ public class Etcd2ConfigurationSource implements ConfigurationSource {
                     try {
                         response = promise.get();
                         if (response != null) {
-                            String value = response.node.value;
-                            log.info("Value changed. Key: " + fullKey + " New value: " + value);
+                            String newValue = response.node.value;
+                            String newKey = response.node.key;
+                            log.info("Value changed. Key: " + parseKeyNameFromEtcd(newKey) + " New value: " + newValue);
 
                             if (configurationDispatcher != null) {
-                                if (value != null) {
-                                    configurationDispatcher.notifyChange(key, value);
+                                if (newValue != null) {
+                                    configurationDispatcher.notifyChange(parseKeyNameFromEtcd(newKey), newValue);
                                 } else {
                                     ConfigurationUtil configurationUtil = ConfigurationUtil.getInstance();
-                                    String fallbackConfig = configurationUtil.get(key).orElse(null);
+                                    String fallbackConfig = configurationUtil.get(parseKeyNameFromEtcd(newKey))
+                                            .orElse(null);
                                     if (fallbackConfig != null) {
                                         configurationDispatcher.notifyChange(key, fallbackConfig);
                                     }
@@ -354,10 +404,11 @@ public class Etcd2ConfigurationSource implements ConfigurationSource {
 
     private String parseKeyNameForEtcd(String key) {
 
+        key = key.replace("[", ".[");
         String[] splittedKey = key.split("\\.");
 
         StringBuilder parsedKey = new StringBuilder();
-        for(String s : splittedKey) {
+        for (String s : splittedKey) {
             try {
                 parsedKey.append(URLEncoder.encode(s, "UTF-8")).append("/");
             } catch (UnsupportedEncodingException e) {
@@ -367,6 +418,10 @@ public class Etcd2ConfigurationSource implements ConfigurationSource {
 
         return parsedKey.deleteCharAt(parsedKey.length() - 1).toString();
 
+    }
+
+    private String parseKeyNameFromEtcd(String key) {
+        return key.substring(this.namespace.length() + 2).replace("/", ".").replace(".[", "[");
     }
 
     public String getNamespace() {

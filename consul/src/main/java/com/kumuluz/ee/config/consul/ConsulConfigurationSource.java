@@ -190,8 +190,7 @@ public class ConsulConfigurationSource implements ConfigurationSource {
             for (Value v : values) {
                 String nodeKey = v.getKey();
                 try {
-                    arrayIndexes.add(Integer.parseInt(nodeKey.substring(key.length() + 2, key.length() + 3)));
-
+                    arrayIndexes.add(Integer.parseInt(nodeKey.substring(key.length() + 2, nodeKey.length() - 1)));
                 } catch (NumberFormatException e) {
                 }
 

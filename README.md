@@ -16,6 +16,8 @@ KumuluzEE Config has been designed to support modularity with plugable configura
 Consul key-value stores are supported to act as configuration servers. In the future, other data stores and 
 configuration servers will be supported too (contributions are welcome).
 
+The extension supports KumuluzEE version 2.4.0 or higher.
+
 ## Usage
 KumuluzEE defines interfaces for common configuraion management features and two basic configuration sources; 
 environment variables and configuration files. To include configuration sources from this project you need to include a 

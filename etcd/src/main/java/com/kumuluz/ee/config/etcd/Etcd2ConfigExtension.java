@@ -26,8 +26,8 @@ import com.kumuluz.ee.common.dependencies.EeExtensionDef;
 import com.kumuluz.ee.common.dependencies.EeExtensionGroup;
 import com.kumuluz.ee.common.wrapper.KumuluzServerWrapper;
 import com.kumuluz.ee.configuration.ConfigurationSource;
-
-import java.util.logging.Logger;
+import com.kumuluz.ee.logs.LogManager;
+import com.kumuluz.ee.logs.Logger;
 
 /**
  * KumuluzEE framework extension for adding etcd configuration source in configuration util.
@@ -37,7 +37,7 @@ import java.util.logging.Logger;
 @EeExtensionDef(name = "etcd", group = EeExtensionGroup.CONFIG)
 public class Etcd2ConfigExtension implements ConfigExtension {
 
-    private static final Logger log = Logger.getLogger(Etcd2ConfigExtension.class.getName());
+    private static final Logger log = LogManager.getLogger(Etcd2ConfigExtension.class.getName());
 
     private ConfigurationSource configurationSource;
 

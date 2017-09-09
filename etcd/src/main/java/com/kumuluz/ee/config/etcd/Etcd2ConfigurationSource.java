@@ -27,6 +27,8 @@ import com.kumuluz.ee.config.utils.ParseUtils;
 import com.kumuluz.ee.configuration.ConfigurationSource;
 import com.kumuluz.ee.configuration.utils.ConfigurationDispatcher;
 import com.kumuluz.ee.configuration.utils.ConfigurationUtil;
+import com.kumuluz.ee.logs.LogManager;
+import com.kumuluz.ee.logs.Logger;
 import io.netty.handler.ssl.SslContext;
 import io.netty.handler.ssl.SslContextBuilder;
 import mousio.client.retry.RetryOnce;
@@ -50,7 +52,6 @@ import java.security.cert.CertificateFactory;
 import java.security.cert.X509Certificate;
 import java.util.*;
 import java.util.concurrent.TimeoutException;
-import java.util.logging.Logger;
 
 /**
  * Util class for getting and setting configuration properties for etcd API v2.
@@ -59,7 +60,7 @@ import java.util.logging.Logger;
  */
 public class Etcd2ConfigurationSource implements ConfigurationSource {
 
-    private static final Logger log = Logger.getLogger(Etcd2ConfigurationSource.class.getName());
+    private static final Logger log = LogManager.getLogger(Etcd2ConfigurationSource.class.getName());
 
     private EtcdClient etcd;
     private ConfigurationDispatcher configurationDispatcher;
@@ -104,9 +105,9 @@ public class Etcd2ConfigurationSource implements ConfigurationSource {
                 sslContext = SslContextBuilder.forClient().trustManager(certificate).build();
 
             } catch (CertificateException e) {
-                log.severe("Certificate exception: " + e.toString());
+                log.error("Certificate exception.", e);
             } catch (SSLException e) {
-                log.severe("SSL exception: " + e.toString());
+                log.error("SSL exception.", e);
             }
 
         }
@@ -134,7 +135,7 @@ public class Etcd2ConfigurationSource implements ConfigurationSource {
             }
 
             if (etcdHosts.length % 2 == 0) {
-                log.warning("Using an odd number of etcd hosts is recommended. See etcd documentation.");
+                log.warn("Using an odd number of etcd hosts is recommended. See etcd documentation.");
             }
 
             if (etcdSecurityContext != null) {
@@ -156,7 +157,7 @@ public class Etcd2ConfigurationSource implements ConfigurationSource {
             log.info("etcd2 configuration source successfully initialised.");
 
         } else {
-            log.severe("No etcd server hosts provided. Specify hosts with configuration key" +
+            log.error("No etcd server hosts provided. Specify hosts with configuration key" +
                     "kumuluzee.config.etcd.hosts in format " +
                     "http://192.168.99.100:2379,http://192.168.99.101:2379,http://192.168.99.102:2379");
         }
@@ -174,13 +175,13 @@ public class Etcd2ConfigurationSource implements ConfigurationSource {
             try {
                 value = etcd.get(key).send().get().getNode().getValue();
             } catch (IOException e) {
-                log.severe("IO Exception. Cannot read given key: " + e + " Key: " + key);
+                log.error("IO Exception. Cannot read given key. Key: " + key, e);
             } catch (EtcdException e) {
-                log.info("etcd: " + e + " Key: " + key);
+                log.info("etcd Exception. Cannot read given key. Key: " + key, e);
             } catch (EtcdAuthenticationException e) {
-                log.severe("Etcd authentication exception. Cannot read given key: " + e + " Key: " + key);
+                log.error("Etcd authentication exception. Cannot read given key. Key: " + key, e);
             } catch (TimeoutException e) {
-                log.severe("Timeout exception. Cannot read given key time: " + e + " Key: " + key);
+                log.error("Timeout exception. Cannot read given key. Key: " + key, e);
             }
 
             if (value != null) {
@@ -283,13 +284,13 @@ public class Etcd2ConfigurationSource implements ConfigurationSource {
             try {
                 nodes = etcd.getDir(parseKeyNameForEtcd(key)).send().get().getNode().getNodes();
             } catch (IOException e) {
-                log.severe("IO Exception. Cannot read given key: " + e + " Key: " + key);
+                log.error("IO Exception. Cannot read given key. Key: " + key, e);
             } catch (EtcdException e) {
-                log.info("etcd: " + e + " Key: " + key);
+                log.info("etcd Exception. Cannot read given key. Key: " + key, e);
             } catch (EtcdAuthenticationException e) {
-                log.severe("Etcd authentication exception. Cannot read given key: " + e + " Key: " + key);
+                log.error("Etcd authentication exception. Cannot read given key. Key: " + key, e);
             } catch (TimeoutException e) {
-                log.severe("Timeout exception. Cannot read given key time: " + e + " Key: " + key);
+                log.error("Timeout exception. Cannot read given key. Key: " + key, e);
             }
 
             Set<String> mapKeys = new HashSet<>();
@@ -326,7 +327,7 @@ public class Etcd2ConfigurationSource implements ConfigurationSource {
                     Throwable t = promise.getException();
                     if (t instanceof EtcdException) {
                         if (((EtcdException) t).isErrorCode(EtcdErrorCode.NodeExist)) {
-                            log.severe("Exception in etcd promise: " + ((EtcdException) t).etcdMessage);
+                            log.error("Exception in etcd promise.", t);
                         }
                     }
 
@@ -355,7 +356,7 @@ public class Etcd2ConfigurationSource implements ConfigurationSource {
                         watch(key);
 
                     } catch (Exception e) {
-                        log.severe("Exception retrieving key value in watch. Exception: " + e.toString());
+                        log.error("Exception retrieving key value in watch.", e);
                     }
                 });
 
@@ -373,11 +374,11 @@ public class Etcd2ConfigurationSource implements ConfigurationSource {
                 EtcdKeysResponse response = etcd.put(parseKeyNameForEtcd(key), value).send().get();
 
                 if (!response.getNode().getValue().equals(value)) {
-                    log.severe("Error: value was not set.");
+                    log.error("Error: value was not set.");
                 }
 
             } catch (IOException | EtcdException | EtcdAuthenticationException | TimeoutException e) {
-                log.severe("Cannot set key: " + e);
+                log.error("Cannot set key.", e);
             }
         }
     }
@@ -412,7 +413,7 @@ public class Etcd2ConfigurationSource implements ConfigurationSource {
             try {
                 parsedKey.append(URLEncoder.encode(s, "UTF-8")).append("/");
             } catch (UnsupportedEncodingException e) {
-                log.severe("UTF-8 encoding not supported.");
+                log.error("UTF-8 encoding not supported.", e);
             }
         }
 

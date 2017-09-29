@@ -402,6 +402,11 @@ public class Etcd2ConfigurationSource implements ConfigurationSource {
         set(key, value.toString());
     }
 
+    @Override
+    public Integer getOrdinal() {
+        return getInteger(CONFIG_ORDINAL).orElse(110);
+    }
+
     private String parseKeyNameForEtcd(String key) {
 
         key = key.replace("[", ".[");

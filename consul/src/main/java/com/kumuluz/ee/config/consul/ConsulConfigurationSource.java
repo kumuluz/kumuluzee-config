@@ -361,6 +361,11 @@ public class ConsulConfigurationSource implements ConfigurationSource {
         set(key, value.toString());
     }
 
+    @Override
+    public Integer getOrdinal() {
+        return getInteger(CONFIG_ORDINAL).orElse(110);
+    }
+
     private String parseKeyNameFromConsul(String key) {
         return key.substring(this.namespace.length() + 1).replace("/", ".").replace(".[", "[");
     }

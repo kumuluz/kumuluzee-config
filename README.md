@@ -60,6 +60,38 @@ authentication-enabled etcd host, username and password have to be defined with 
 https://coreos.com/etcd/docs/latest/op-guide/security.html To access HTTPS-enabled etcd host, PEM certificate string
 have to be defined with configuration key `kumuluzee.config.etcd.ca`.
 
+Sample configuration file: 
+
+```yaml
+kumuluzee:
+  config:
+    start-retry-delay-ms: 500
+    max-retry-delay-ms: 900000
+    etcd:
+      hosts: http://192.168.99.100:2379,http://192.168.99.101:2379,http://192.168.99.102:2379
+      username: root
+      password: admin
+      ca: -----BEGIN CERTIFICATE-----
+          MIIDDjCCAfagAwIBAgIUZzEIr206GOYqlxHLWtUUEu2ztvcwDQYJKoZIhvcNAQEL
+          BQAwDTELMAkGA1UEAxMCQ0EwHhcNMTcwNDEwMDcyMDAwWhcNMjIwNDA5MDcyMDAw
+          WjANMQswCQYDVQQDEwJDQTCCASIwDQYJKoZIhvcNAQEBBQADggEPADCCAQoCggEB
+          AMKAeFREzc3wjOCQ8RlbnTJmD0PUls4HS6lV/xlRKbsNwqC3rxpoSp7lDoVy6MNr
+          vX+7ZiyL05bkhWfF6Vzqqy6BVc6ock+nsIQyn1mXaTYDftue2z142KpjPLsj9YbP
+          r2C5fmQk3rigQER95nT4gX3SleFENrnsmJU8bOt59b33uaYv6WLKUCInADITsQAN
+          O8LiQ4scRwQXMFq0xORWdno9xPoRZOKMi5p+mIN0cGl9/+ComuqIcWomjKkWYK58
+          Qhsy9jSaFYo6INMKLAjnmu5qY2Z7Hpf6iaVjgCayO8IXBWegspCTtZWZKOCpbO4A
+          w3iH1eCz6VaG3F9FC1yWlh0CAwEAdaNmMGQwDgYDVR0PAQH/BAQDAgEGMBIGA1Ud
+          EwEB/wQIMAYBAf8CAQIwHQYDeoklfBYEFBG6m7kZljsfFK2MTnQ5RWdM+mnDMB8G
+          A1UdIwQYMBaAFBG6m7kZljsfFK2MTnQ5RWdM+mnDMA0GCSqGSIb3DQEBCwUAA4IB
+          AQAT3tRmXGqt8Uh3Va0+Rlm4MDzcFsD7aO77tJuELCDC4cOCeROCEtYNJGm33MFe
+          buxwaZ+zAneg5a1DtDkdjMZ6N+CVkMBTDWWm8cuo6Dm3HKWr+Rtd6Z8LwOq/X40C
+          CHyowEYlYZSAof9rOHwn0rt8zgUSmZV6z9PXwFajwE2nEU7wlglYXtuLqBNzUYeN
+          wYNnVFjMYtsWKgi/3nCegXastYGqoDpnAT25CsExrRuxAQw5i5WJU5RJwNsOPod5
+          6X2Iz/EV5flbWti5OcoxLr3pfaCueLa71E+mPDKlWB55BXdNyHyS248msZC7UD2I
+          Opyz239QjRq2HRMl+i7C0e6O
+          -----END CERTIFICATE-----
+```
+
 **Configuring Consul**
 
 By default, KumuluzEE Config Consul automatically connects to the local agent at http://localhost:8500. This behaviour 

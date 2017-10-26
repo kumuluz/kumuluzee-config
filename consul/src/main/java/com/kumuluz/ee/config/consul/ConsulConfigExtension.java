@@ -32,7 +32,9 @@ import java.util.logging.Logger;
 /**
  * KumuluzEE framework extension for adding Consul configuration source in configuration util.
  *
- * @author Jan Meznarič, Urban Malc
+ * @author Urban Malc
+ * @author Jan Meznarič
+ * @since 1.0.0
  */
 @EeExtensionDef(name = "Consul", group = EeExtensionGroup.CONFIG)
 public class ConsulConfigExtension implements ConfigExtension {

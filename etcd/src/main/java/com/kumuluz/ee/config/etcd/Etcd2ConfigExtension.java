@@ -33,6 +33,7 @@ import java.util.logging.Logger;
  * KumuluzEE framework extension for adding etcd configuration source in configuration util.
  *
  * @author Jan Meznarič
+ * @since 1.0.0
  */
 @EeExtensionDef(name = "etcd", group = EeExtensionGroup.CONFIG)
 public class Etcd2ConfigExtension implements ConfigExtension {

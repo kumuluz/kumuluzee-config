@@ -56,6 +56,7 @@ import java.util.logging.Logger;
  * Util class for getting and setting configuration properties for etcd API v2.
  *
  * @author Jan Meznarič
+ * @since 1.0.0
  */
 public class Etcd2ConfigurationSource implements ConfigurationSource {
 

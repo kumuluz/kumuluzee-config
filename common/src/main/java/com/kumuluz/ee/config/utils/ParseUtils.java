@@ -24,9 +24,11 @@ package com.kumuluz.ee.config.utils;
 import java.util.Optional;
 
 /**
- * Util class for parsing.
+ * Util class for parsing configuration values.
  *
- * @author Jan Meznarič, Urban Malc
+ * @author Urban Malc
+ * @author Jan Meznarič
+ * @since 1.0.0
  */
 public class ParseUtils {
 

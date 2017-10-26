@@ -46,7 +46,9 @@ import java.util.logging.Logger;
 /**
  * Util class for getting and setting configuration properties for Consul Key-Value store.
  *
- * @author Jan Meznarič, Urban Malc
+ * @author Urban Malc
+ * @author Jan Meznarič
+ * @since 1.0.0
  */
 public class ConsulConfigurationSource implements ConfigurationSource {
 

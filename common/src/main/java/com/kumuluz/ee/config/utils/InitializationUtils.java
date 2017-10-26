@@ -29,7 +29,9 @@ import java.util.Optional;
 /**
  * Util class for getting initialization parameters.
  *
- * @author Jan Meznarič, Urban Malc
+ * @author Urban Malc
+ * @author Jan Meznarič
+ * @since 1.0.0
  */
 public class InitializationUtils {
 
@@ -46,18 +48,18 @@ public class InitializationUtils {
         }
 
         String env = eeConfig.getEnv().getName();
-        if(env == null || env.isEmpty()) {
+        if (env == null || env.isEmpty()) {
             env = configurationUtil.get("kumuluzee.env").orElse("dev");
         }
 
         String serviceName = eeConfig.getName();
-        if(serviceName == null || serviceName.isEmpty()) {
+        if (serviceName == null || serviceName.isEmpty()) {
             serviceName = configurationUtil.get("kumuluzee.service-name").orElse(null);
         }
 
-        if(serviceName != null && !serviceName.isEmpty()) {
+        if (serviceName != null && !serviceName.isEmpty()) {
             String serviceVersion = eeConfig.getVersion();
-            if(serviceVersion == null || serviceVersion.isEmpty()) {
+            if (serviceVersion == null || serviceVersion.isEmpty()) {
                 serviceVersion = configurationUtil.get("kumuluzee.version").orElse("1.0.0");
             }
             return "environments/" + env + "/services/" + serviceName + "/" + serviceVersion + "/config";
@@ -68,7 +70,7 @@ public class InitializationUtils {
 
     public static int getStartRetryDelayMs(ConfigurationUtil configurationUtil, String implementation) {
         Optional<Integer> universalConfig = configurationUtil.getInteger("kumuluzee.config.start-retry-delay-ms");
-        if(universalConfig.isPresent()) {
+        if (universalConfig.isPresent()) {
             return universalConfig.get();
         } else {
             return configurationUtil.getInteger("kumuluzee.config." + implementation + ".start-retry-delay-ms")
@@ -78,7 +80,7 @@ public class InitializationUtils {
 
     public static int getMaxRetryDelayMs(ConfigurationUtil configurationUtil, String implementation) {
         Optional<Integer> universalConfig = configurationUtil.getInteger("kumuluzee.config.max-retry-delay-ms");
-        if(universalConfig.isPresent()) {
+        if (universalConfig.isPresent()) {
             return universalConfig.get();
         } else {
             return configurationUtil.getInteger("kumuluzee.config." + implementation + ".max-retry-delay-ms")

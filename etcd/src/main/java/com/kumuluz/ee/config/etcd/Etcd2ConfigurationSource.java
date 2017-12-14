@@ -17,7 +17,7 @@
  *  out of or in connection with the software or the use or other dealings in the
  *  software. See the License for the specific language governing permissions and
  *  limitations under the License.
-*/
+ */
 
 package com.kumuluz.ee.config.etcd;
 
@@ -177,7 +177,7 @@ public class Etcd2ConfigurationSource implements ConfigurationSource {
             } catch (IOException e) {
                 log.severe("IO Exception. Cannot read given key: " + e + " Key: " + key);
             } catch (EtcdException e) {
-                log.info("etcd: " + e + " Key: " + key);
+                log.fine("etcd: " + e + " Key: " + key);
             } catch (EtcdAuthenticationException e) {
                 log.severe("Etcd authentication exception. Cannot read given key: " + e + " Key: " + key);
             } catch (TimeoutException e) {

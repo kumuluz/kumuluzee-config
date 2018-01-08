@@ -29,6 +29,7 @@ import com.kumuluz.ee.configuration.utils.ConfigurationDispatcher;
 import com.kumuluz.ee.configuration.utils.ConfigurationUtil;
 import io.netty.handler.ssl.SslContext;
 import io.netty.handler.ssl.SslContextBuilder;
+import io.netty.util.concurrent.BlockingOperationException;
 import mousio.client.retry.RetryOnce;
 import mousio.client.retry.RetryWithExponentialBackOff;
 import mousio.etcd4j.EtcdClient;
@@ -233,7 +234,7 @@ public class Etcd2ConfigurationSource implements ConfigurationSource {
             } catch (IOException e) {
                 log.severe("IO Exception. Cannot read given key: " + e + " Key: " + key);
             } catch (EtcdException e) {
-                log.info("etcd: " + e + " Key: " + key);
+                log.fine("etcd: " + e + " Key: " + key);
             } catch (EtcdAuthenticationException e) {
                 log.severe("Etcd authentication exception. Cannot read given key: " + e + " Key: " + key);
             } catch (TimeoutException e) {
@@ -286,7 +287,7 @@ public class Etcd2ConfigurationSource implements ConfigurationSource {
             } catch (IOException e) {
                 log.severe("IO Exception. Cannot read given key: " + e + " Key: " + key);
             } catch (EtcdException e) {
-                log.info("etcd: " + e + " Key: " + key);
+                log.fine("etcd: " + e + " Key: " + key);
             } catch (EtcdAuthenticationException e) {
                 log.severe("Etcd authentication exception. Cannot read given key: " + e + " Key: " + key);
             } catch (TimeoutException e) {
@@ -355,6 +356,11 @@ public class Etcd2ConfigurationSource implements ConfigurationSource {
 
                         watch(key);
 
+                    } catch (BlockingOperationException e) {
+                        // retry -- get key value and set a new watch
+                        configurationDispatcher.notifyChange(key, ConfigurationUtil.getInstance().get(key).orElse
+                                (null));
+                        watch(key);
                     } catch (Exception e) {
                         log.severe("Exception retrieving key value in watch. Exception: " + e.toString());
                     }

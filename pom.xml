@@ -6,7 +6,7 @@
 
     <groupId>com.kumuluz.ee.config</groupId>
     <artifactId>kumuluzee-config</artifactId>
-    <version>1.1.0-SNAPSHOT</version>
+    <version>1.1.0</version>
     <modules>
         <module>etcd</module>
         <module>consul</module>
@@ -29,7 +29,7 @@
         <maven.compiler.target>1.8</maven.compiler.target>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 
-        <kumuluzee.version>2.6.0-SNAPSHOT</kumuluzee.version>
+        <kumuluzee.version>2.5.1</kumuluzee.version>
 
         <consul-client.version>0.17.1</consul-client.version>
         <etcd4j.version>2.14.0</etcd4j.version>
@@ -86,7 +86,7 @@
             <dependency>
                 <groupId>com.kumuluz.ee.config</groupId>
                 <artifactId>kumuluzee-config-common</artifactId>
-                <version>1.1.0-SNAPSHOT</version>
+                <version>1.1.0</version>
             </dependency>
         </dependencies>
     </dependencyManagement>

@@ -7,7 +7,7 @@ servers.
 KumuluzEE Config is an open-source configuration management extension for the KumuluzEE framework. It extends basic 
 configuration framework which is a part of KumuluzEE framework, described 
 [here](https://github.com/kumuluz/kumuluzee/wiki/Configuration). It provides support for additional configuration 
-sources in addition to environment variables and configuration files. 
+sources in addition to environment variables, system properties and configuration files. 
 
 KumuluzEE Config follows the idea of an unified configuration API for the framework and provides additional
 configuration sources which can be utilised with a standard KumuluzEE configuration interface. 
@@ -19,9 +19,9 @@ configuration servers will be supported too (contributions are welcome).
 The extension supports KumuluzEE version 2.4.0 or higher.
 
 ## Usage
-KumuluzEE defines interfaces for common configuraion management features and two basic configuration sources; 
-environment variables and configuration files. To include configuration sources from this project you need to include a 
-dependency to an implementation library. 
+KumuluzEE defines interfaces for common configuraion management features and three basic configuration sources; 
+environment variables, system properties and configuration files. To include configuration sources from this project
+you need to include a dependency to an implementation library. 
 
 You can include etcd implementation by adding the following dependency:
 
@@ -99,9 +99,9 @@ can be overridden by specifying agent URL with configuration key `kumuluzee.conf
 
 **Configuration source priorities**
 
-Included source acts as any other configuration source. It has the second highest priority, which means that properties 
+Included source acts as any other configuration source. It has the third highest priority, which means that properties 
 from etcd override properties from configuration files and can be overwritten with properties from environmental 
-variables. Future releases will introduce configurable priorities of configuration sources.
+variables and system properties.
 
 **Configuration properties inside etcd**
 

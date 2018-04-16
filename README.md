@@ -4,7 +4,7 @@
 > Configuration extension for the KumuluzEE microservice framework with support for etcd and Consul configuration 
 servers.
 
-KumuluzEE Config is an open-source configuration management extension for the KumuluzEE framework. It extends basic 
+KumuluzEE Config is an open-source configuration management project for the KumuluzEE framework. It extends basic 
 configuration framework which is a part of KumuluzEE framework, described 
 [here](https://github.com/kumuluz/kumuluzee/wiki/Configuration). It provides support for additional configuration 
 sources in addition to environment variables, system properties and configuration files. 
@@ -16,7 +16,7 @@ KumuluzEE Config has been designed to support modularity with plugable configura
 Consul key-value stores are supported to act as configuration servers. In the future, other data stores and 
 configuration servers will be supported too (contributions are welcome).
 
-The extension supports KumuluzEE version 2.4.0 or higher.
+Project supports KumuluzEE version 2.4.0 or higher.
 
 ## Usage
 KumuluzEE defines interfaces for common configuraion management features and three basic configuration sources; 

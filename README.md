@@ -9,10 +9,10 @@ configuration framework which is a part of KumuluzEE framework, described
 [here](https://github.com/kumuluz/kumuluzee/wiki/Configuration). It provides support for additional configuration 
 sources in addition to environment variables, system properties and configuration files. 
 
-KumuluzEE Config follows the idea of an unified configuration API for the framework and provides additional
+KumuluzEE Config follows the idea of a unified configuration API for the framework and provides additional
 configuration sources which can be utilised with a standard KumuluzEE configuration interface. 
 
-KumuluzEE Config has been designed to support modularity with plugable configuration sources. Currently, etcd and 
+KumuluzEE Config has been designed to support modularity with pluggable configuration sources. Currently, etcd and 
 Consul key-value stores are supported to act as configuration servers. In the future, other data stores and 
 configuration servers will be supported too (contributions are welcome).
 

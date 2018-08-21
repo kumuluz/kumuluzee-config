@@ -19,7 +19,7 @@ configuration servers will be supported too (contributions are welcome).
 Project supports KumuluzEE version 2.4.0 or higher.
 
 ## Usage
-KumuluzEE defines interfaces for common configuraion management features and three basic configuration sources; 
+KumuluzEE defines interfaces for common configuration management features and three basic configuration sources; 
 environment variables, system properties and configuration files. To include configuration sources from this project
 you need to include a dependency to an implementation library. 
 

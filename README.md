@@ -233,7 +233,7 @@ java -cp target/classes;target/dependency/* com.kumuluz.ee.EeApplication
 
 ## Changelog
 
-Recent changes can be viewed on Github on the [Releases Page](https://github.com/kumuluz/kumuluzee/releases)
+Recent changes can be viewed on Github on the [Releases Page](https://github.com/kumuluz/kumuluzee-config/releases)
 
 ## Contribute
 

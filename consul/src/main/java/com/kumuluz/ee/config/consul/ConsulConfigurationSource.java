@@ -17,7 +17,7 @@
  *  out of or in connection with the software or the use or other dealings in the
  *  software. See the License for the specific language governing permissions and
  *  limitations under the License.
-*/
+ */
 package com.kumuluz.ee.config.consul;
 
 import com.kumuluz.ee.common.config.EeConfig;
@@ -139,7 +139,7 @@ public class ConsulConfigurationSource implements ConfigurationSource {
         Optional<String> value = Optional.empty();
 
         try {
-            value = kvClient.getValueAsString(key).transform(java.util.Optional::of).or(java.util.Optional.empty());
+            value = kvClient.getValueAsString(key);
         } catch (ConsulException e) {
             log.severe("Consul exception: " + e.getLocalizedMessage());
         }
@@ -269,7 +269,7 @@ public class ConsulConfigurationSource implements ConfigurationSource {
 
                         for (Value v : consulResponse.getResponse()) {
 
-                            com.google.common.base.Optional<String> valueOpt = v.getValueAsString();
+                            Optional<String> valueOpt = v.getValueAsString();
                             String newKey = v.getKey();
 
                             if (valueOpt.isPresent() && configurationDispatcher != null) {

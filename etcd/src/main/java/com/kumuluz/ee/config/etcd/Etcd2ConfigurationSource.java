@@ -27,6 +27,7 @@ import com.kumuluz.ee.config.utils.ParseUtils;
 import com.kumuluz.ee.configuration.ConfigurationSource;
 import com.kumuluz.ee.configuration.utils.ConfigurationDispatcher;
 import com.kumuluz.ee.configuration.utils.ConfigurationUtil;
+import com.kumuluz.ee.configuration.utils.DecoderUtils;
 import io.netty.handler.ssl.SslContext;
 import io.netty.handler.ssl.SslContextBuilder;
 import io.netty.util.concurrent.BlockingOperationException;
@@ -342,7 +343,12 @@ public class Etcd2ConfigurationSource implements ConfigurationSource {
 
                             if (configurationDispatcher != null) {
                                 if (newValue != null) {
-                                    configurationDispatcher.notifyChange(parseKeyNameFromEtcd(newKey), newValue);
+                                    configurationDispatcher
+                                            .notifyChange(
+                                                    parseKeyNameFromEtcd(newKey),
+                                                    DecoderUtils.decodeConfigValueIfEncoded(
+                                                            parseKeyNameFromEtcd(newKey),
+                                                            newValue));
                                 } else {
                                     ConfigurationUtil configurationUtil = ConfigurationUtil.getInstance();
                                     String fallbackConfig = configurationUtil.get(parseKeyNameFromEtcd(newKey))

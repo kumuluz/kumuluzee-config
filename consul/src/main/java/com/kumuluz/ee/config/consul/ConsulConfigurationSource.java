@@ -17,7 +17,7 @@
  *  out of or in connection with the software or the use or other dealings in the
  *  software. See the License for the specific language governing permissions and
  *  limitations under the License.
-*/
+ */
 package com.kumuluz.ee.config.consul;
 
 import com.kumuluz.ee.common.config.EeConfig;
@@ -26,6 +26,7 @@ import com.kumuluz.ee.config.utils.ParseUtils;
 import com.kumuluz.ee.configuration.ConfigurationSource;
 import com.kumuluz.ee.configuration.utils.ConfigurationDispatcher;
 import com.kumuluz.ee.configuration.utils.ConfigurationUtil;
+import com.kumuluz.ee.configuration.utils.DecoderUtils;
 import com.orbitz.consul.Consul;
 import com.orbitz.consul.ConsulException;
 import com.orbitz.consul.KeyValueClient;
@@ -275,7 +276,11 @@ public class ConsulConfigurationSource implements ConfigurationSource {
                             if (valueOpt.isPresent() && configurationDispatcher != null) {
                                 log.info("Consul watch callback for key " + parseKeyNameFromConsul(newKey) +
                                         " invoked. " + "New value: " + valueOpt.get());
-                                configurationDispatcher.notifyChange(parseKeyNameFromConsul(newKey), valueOpt.get());
+                                configurationDispatcher.notifyChange(
+                                        parseKeyNameFromConsul(newKey),
+                                        DecoderUtils.decodeConfigValueIfEncoded(
+                                                parseKeyNameFromConsul(newKey),
+                                                valueOpt.get()));
                                 previouslyDeleted = false;
                             } else {
                                 log.info("Consul watch callback for key " + parseKeyNameFromConsul(newKey) +

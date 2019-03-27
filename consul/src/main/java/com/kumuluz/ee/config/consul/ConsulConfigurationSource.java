@@ -24,6 +24,7 @@ import com.kumuluz.ee.common.config.EeConfig;
 import com.kumuluz.ee.config.utils.InitializationUtils;
 import com.kumuluz.ee.config.utils.ParseUtils;
 import com.kumuluz.ee.configuration.ConfigurationSource;
+import com.kumuluz.ee.configuration.utils.ConfigurationDecoderUtils;
 import com.kumuluz.ee.configuration.utils.ConfigurationDispatcher;
 import com.kumuluz.ee.configuration.utils.ConfigurationUtil;
 import com.orbitz.consul.Consul;
@@ -275,7 +276,11 @@ public class ConsulConfigurationSource implements ConfigurationSource {
                             if (valueOpt.isPresent() && configurationDispatcher != null) {
                                 log.info("Consul watch callback for key " + parseKeyNameFromConsul(newKey) +
                                         " invoked. " + "New value: " + valueOpt.get());
-                                configurationDispatcher.notifyChange(parseKeyNameFromConsul(newKey), valueOpt.get());
+                                configurationDispatcher.notifyChange(
+                                        parseKeyNameFromConsul(newKey),
+                                        ConfigurationDecoderUtils.decodeConfigValueIfEncoded(
+                                                parseKeyNameFromConsul(newKey),
+                                                valueOpt.get()));
                                 previouslyDeleted = false;
                             } else {
                                 log.info("Consul watch callback for key " + parseKeyNameFromConsul(newKey) +

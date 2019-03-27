@@ -24,9 +24,9 @@ import com.kumuluz.ee.common.config.EeConfig;
 import com.kumuluz.ee.config.utils.InitializationUtils;
 import com.kumuluz.ee.config.utils.ParseUtils;
 import com.kumuluz.ee.configuration.ConfigurationSource;
+import com.kumuluz.ee.configuration.utils.ConfigurationDecoderUtils;
 import com.kumuluz.ee.configuration.utils.ConfigurationDispatcher;
 import com.kumuluz.ee.configuration.utils.ConfigurationUtil;
-import com.kumuluz.ee.configuration.utils.DecoderUtils;
 import com.orbitz.consul.Consul;
 import com.orbitz.consul.ConsulException;
 import com.orbitz.consul.KeyValueClient;
@@ -278,7 +278,7 @@ public class ConsulConfigurationSource implements ConfigurationSource {
                                         " invoked. " + "New value: " + valueOpt.get());
                                 configurationDispatcher.notifyChange(
                                         parseKeyNameFromConsul(newKey),
-                                        DecoderUtils.decodeConfigValueIfEncoded(
+                                        ConfigurationDecoderUtils.decodeConfigValueIfEncoded(
                                                 parseKeyNameFromConsul(newKey),
                                                 valueOpt.get()));
                                 previouslyDeleted = false;

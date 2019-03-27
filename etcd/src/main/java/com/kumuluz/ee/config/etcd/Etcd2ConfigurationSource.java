@@ -25,9 +25,9 @@ import com.kumuluz.ee.common.config.EeConfig;
 import com.kumuluz.ee.config.utils.InitializationUtils;
 import com.kumuluz.ee.config.utils.ParseUtils;
 import com.kumuluz.ee.configuration.ConfigurationSource;
+import com.kumuluz.ee.configuration.utils.ConfigurationDecoderUtils;
 import com.kumuluz.ee.configuration.utils.ConfigurationDispatcher;
 import com.kumuluz.ee.configuration.utils.ConfigurationUtil;
-import com.kumuluz.ee.configuration.utils.DecoderUtils;
 import io.netty.handler.ssl.SslContext;
 import io.netty.handler.ssl.SslContextBuilder;
 import io.netty.util.concurrent.BlockingOperationException;
@@ -346,7 +346,7 @@ public class Etcd2ConfigurationSource implements ConfigurationSource {
                                     configurationDispatcher
                                             .notifyChange(
                                                     parseKeyNameFromEtcd(newKey),
-                                                    DecoderUtils.decodeConfigValueIfEncoded(
+                                                    ConfigurationDecoderUtils.decodeConfigValueIfEncoded(
                                                             parseKeyNameFromEtcd(newKey),
                                                             newValue));
                                 } else {

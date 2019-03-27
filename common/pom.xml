@@ -22,4 +22,16 @@
         </dependency>
     </dependencies>
 
+    <profiles>
+        <profile>
+            <id>java9-modules</id>
+            <dependencies>
+                <dependency>
+                    <groupId>javax.xml.bind</groupId>
+                    <artifactId>jaxb-api</artifactId>
+                </dependency>
+            </dependencies>
+        </profile>
+    </profiles>
+
 </project>

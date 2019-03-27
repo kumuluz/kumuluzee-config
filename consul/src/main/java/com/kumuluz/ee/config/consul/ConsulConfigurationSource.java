@@ -140,7 +140,7 @@ public class ConsulConfigurationSource implements ConfigurationSource {
         Optional<String> value = Optional.empty();
 
         try {
-            value = kvClient.getValueAsString(key).transform(java.util.Optional::of).or(java.util.Optional.empty());
+            value = kvClient.getValueAsString(key);
         } catch (ConsulException e) {
             log.severe("Consul exception: " + e.getLocalizedMessage());
         }
@@ -270,7 +270,7 @@ public class ConsulConfigurationSource implements ConfigurationSource {
 
                         for (Value v : consulResponse.getResponse()) {
 
-                            com.google.common.base.Optional<String> valueOpt = v.getValueAsString();
+                            Optional<String> valueOpt = v.getValueAsString();
                             String newKey = v.getKey();
 
                             if (valueOpt.isPresent() && configurationDispatcher != null) {

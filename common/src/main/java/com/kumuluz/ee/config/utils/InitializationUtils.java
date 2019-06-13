@@ -35,6 +35,10 @@ import java.util.Optional;
  */
 public class InitializationUtils {
 
+    private InitializationUtils() {
+        throw new IllegalStateException("Utility class");
+    }
+
     public static String getNamespace(EeConfig eeConfig, ConfigurationUtil configurationUtil, String implementation) {
         String universalNamespace = configurationUtil.get("kumuluzee.config.namespace")
                 .orElse(null);

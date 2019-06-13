@@ -52,6 +52,7 @@ import java.security.cert.CertificateFactory;
 import java.security.cert.X509Certificate;
 import java.util.*;
 import java.util.concurrent.TimeoutException;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 /**
@@ -84,7 +85,7 @@ public class Etcd2ConfigurationSource implements ConfigurationSource {
         ConfigurationUtil configurationUtil = ConfigurationUtil.getInstance();
         // get namespace
         this.namespace = InitializationUtils.getNamespace(eeConfig, configurationUtil, "etcd");
-        log.info("Using namespace: " + this.namespace);
+        log.log(Level.INFO, "Using namespace: {0}", this.namespace);
 
         // get user credentials
         String etcdUsername = configurationUtil.get("kumuluzee.config.etcd.username").orElse(null);
@@ -250,6 +251,7 @@ public class Etcd2ConfigurationSource implements ConfigurationSource {
                     try {
                         arrayIndexes.add(Integer.parseInt(nodeKey.substring(key.length() + 3, nodeKey.length() - 1)));
                     } catch (NumberFormatException e) {
+                        // ignored
                     }
 
                 }
@@ -318,7 +320,7 @@ public class Etcd2ConfigurationSource implements ConfigurationSource {
         String fullKey = namespace + "/" + parseKeyNameForEtcd(key);
 
         if (etcd != null) {
-            log.info("Initializing watch for key: " + fullKey);
+            log.log(Level.INFO, "Initializing watch for key: {0}", fullKey);
             try {
                 EtcdResponsePromise<EtcdKeysResponse> responsePromise = etcd.getDir(fullKey).recursive()
                         .setRetryPolicy(new RetryWithExponentialBackOff(startRetryDelay, -1, maxRetryDelay))
@@ -329,7 +331,7 @@ public class Etcd2ConfigurationSource implements ConfigurationSource {
                     Throwable t = promise.getException();
                     if (t instanceof EtcdException) {
                         if (((EtcdException) t).isErrorCode(EtcdErrorCode.NodeExist)) {
-                            log.severe("Exception in etcd promise: " + ((EtcdException) t).etcdMessage);
+                            log.log(Level.SEVERE, "Exception in etcd promise: {0}", ((EtcdException) t).etcdMessage);
                         }
                     }
 
@@ -339,7 +341,8 @@ public class Etcd2ConfigurationSource implements ConfigurationSource {
                         if (response != null) {
                             String newValue = response.node.value;
                             String newKey = response.node.key;
-                            log.info("Value changed. Key: " + parseKeyNameFromEtcd(newKey) + " New value: " + newValue);
+                            log.log(Level.INFO, "Value changed. Key: {0} New value: {1}",
+                                    new String[]{parseKeyNameFromEtcd(newKey), newValue});
 
                             if (configurationDispatcher != null) {
                                 if (newValue != null) {
@@ -373,7 +376,7 @@ public class Etcd2ConfigurationSource implements ConfigurationSource {
                 });
 
             } catch (IOException e) {
-                e.printStackTrace();
+                log.log(Level.SEVERE, "Unknown etcd exception. Message: {0}", e.getMessage());
             }
         }
     }

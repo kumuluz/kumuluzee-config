@@ -50,6 +50,7 @@ public class Etcd2ConfigExtension implements ConfigExtension {
 
     @Override
     public void load() {
+        // this extension does not perform any action on load
     }
 
     @Override

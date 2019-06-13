@@ -32,6 +32,10 @@ import java.util.Optional;
  */
 public class ParseUtils {
 
+    private ParseUtils() {
+        throw new IllegalStateException("Utility class");
+    }
+
     public static Optional<Boolean> parseOptionalStringToOptionalBoolean(Optional<String> optString) {
         return optString.map(Boolean::valueOf);
     }

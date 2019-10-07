@@ -122,6 +122,25 @@ overwritten with key `kumuluzee.config.namespace`. Example:
 Namespace is used as a first part of the key used for etcd key/value store. Example: with set `kumuluzee.env.name: dev`, 
 field `port` from example bellow is in etcd stored in key `/environments/dev/services/test-service/config/port`.
 
+Lists can be stored in etcd in dedicated directories with key names as indexes [0], [1], [2], ...
+
+The following list in yaml
+
+```yml
+sample-list:
+   - first
+   - second
+   - third 
+```
+
+can be stored with the following etcd keys:
+
+```
+environments/dev/services/customer-service/1.2.3/config/sample-list/[0]=first
+environments/dev/services/customer-service/1.2.3/config/sample-list/[1]=second
+environments/dev/services/customer-service/1.2.3/config/sample-list/[2]=third
+```
+
 **Configuration properties inside Consul**
 
 Configuration properties in Consul are stored in a similar way as in etcd.

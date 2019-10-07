@@ -280,13 +280,13 @@ public class Etcd2ConfigurationSource implements ConfigurationSource {
     @Override
     public Optional<List<String>> getMapKeys(String key) {
 
-        key = namespace + "." + key;
+        key = namespace + "/" + parseKeyNameForEtcd(key);
 
         if (etcd != null) {
 
             List<EtcdKeysResponse.EtcdNode> nodes = null;
             try {
-                nodes = etcd.getDir(parseKeyNameForEtcd(key)).send().get().getNode().getNodes();
+                nodes = etcd.getDir(key).send().get().getNode().getNodes();
             } catch (IOException e) {
                 log.severe("IO Exception. Cannot read given key: " + e + " Key: " + key);
             } catch (EtcdException e) {

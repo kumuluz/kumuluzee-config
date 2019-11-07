@@ -384,9 +384,11 @@ public class Etcd2ConfigurationSource implements ConfigurationSource {
     @Override
     public void set(String key, String value) {
 
+        key = namespace + "/" + parseKeyNameForEtcd(key);
+
         if (etcd != null) {
             try {
-                EtcdKeysResponse response = etcd.put(parseKeyNameForEtcd(key), value).send().get();
+                EtcdKeysResponse response = etcd.put(key, value).send().get();
 
                 if (!response.getNode().getValue().equals(value)) {
                     log.severe("Error: value was not set.");

@@ -157,7 +157,7 @@ public class Etcd2ConfigurationSource implements ConfigurationSource {
             startRetryDelay = InitializationUtils.getStartRetryDelayMs(configurationUtil, "etcd");
             maxRetryDelay = InitializationUtils.getMaxRetryDelayMs(configurationUtil, "etcd");
 
-            log.info("etcd2 configuration source successfully initialised.");
+            log.info("etcd2 configuration source successfully initialized.");
 
         } else {
             log.severe("No etcd server hosts provided. Specify hosts with configuration key" +

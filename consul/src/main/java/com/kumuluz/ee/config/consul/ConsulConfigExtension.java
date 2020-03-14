@@ -45,7 +45,7 @@ public class ConsulConfigExtension implements ConfigExtension {
 
     @Override
     public void init(KumuluzServerWrapper kumuluzServerWrapper, EeConfig eeConfig) {
-        log.info("Initialising Consul configuration source.");
+        log.info("Initializing Consul configuration source.");
         configurationSource = new ConsulConfigurationSource(eeConfig);
     }
 

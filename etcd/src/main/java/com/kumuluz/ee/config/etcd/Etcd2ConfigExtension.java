@@ -44,7 +44,7 @@ public class Etcd2ConfigExtension implements ConfigExtension {
 
     @Override
     public void init(KumuluzServerWrapper kumuluzServerWrapper, EeConfig eeConfig) {
-        log.info("Initialising etcd2 configuration source.");
+        log.info("Initializing etcd2 configuration source.");
         configurationSource = new Etcd2ConfigurationSource(eeConfig);
     }
 

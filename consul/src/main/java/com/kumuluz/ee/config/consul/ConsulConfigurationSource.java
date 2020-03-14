@@ -125,7 +125,7 @@ public class ConsulConfigurationSource implements ConfigurationSource {
         kvClient = consul.keyValueClient();
 
         if (pingSuccessful) {
-            log.info("Consul configuration source successfully initialised.");
+            log.info("Consul configuration source successfully initialized.");
         } else {
             log.warning("Consul configuration source initialized, but Consul agent inaccessible. " +
                     "Configuration source may not work as expected.");

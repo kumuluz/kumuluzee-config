@@ -259,8 +259,8 @@ public class ZookeeperConfigurationSource implements ConfigurationSource {
     /**
      * Parses Kumuluzee key to Zookeeper key
      *
-     * @param key dot-separated string: <tt>val1.val2.val3</tt>
-     * @return slash-separated string: <tt>/val1/val2/val3</tt>
+     * @param key dot-separated string: <code>val1.val2.val3</code>
+     * @return slash-separated string: <code>/val1/val2/val3</code>
      */
     private String parseKeyNameForZookeeper(String key) {
         key = key.replace("[", ".[");
@@ -277,8 +277,8 @@ public class ZookeeperConfigurationSource implements ConfigurationSource {
     /**
      * Returns cumulative list of node paths
      *
-     * @param key dot-separated string: <tt>val1.val2.val3</tt>
-     * @return list of cumulative node paths: <tt>[/val1, /val1/val2, /val1/val2/val3]</tt>
+     * @param key dot-separated string: <code>val1.val2.val3</code>
+     * @return list of cumulative node paths: <code>[/val1, /val1/val2, /val1/val2/val3]</code>
      */
     private List<String> getNodePaths(String key) {
         List<String> listOfNodePaths = new ArrayList<>();

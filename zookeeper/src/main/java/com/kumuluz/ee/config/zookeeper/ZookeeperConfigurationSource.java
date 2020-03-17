@@ -65,7 +65,7 @@ public class ZookeeperConfigurationSource implements ConfigurationSource {
                 });
                 connectionSignal.await();
             } catch (InterruptedException | IOException e) {
-                e.printStackTrace();
+                log.severe("Error initializing Zookeeper! Host is unreacheable.");
             }
         } else {
             log.severe("No Zookeeper server hosts provided. Specify hosts with configuration key" +
@@ -89,7 +89,7 @@ public class ZookeeperConfigurationSource implements ConfigurationSource {
         } catch (KeeperException.NoNodeException e) {
             return Optional.empty();
         } catch (KeeperException | InterruptedException e) {
-            e.printStackTrace();
+            log.log(Level.SEVERE, "Error retrieving key {0}!", key);
             return Optional.empty();
         }
     }
@@ -129,7 +129,7 @@ public class ZookeeperConfigurationSource implements ConfigurationSource {
         } catch (KeeperException.NoNodeException e) {
             return Optional.empty();
         } catch (KeeperException | InterruptedException e) {
-            e.printStackTrace();
+            log.log(Level.SEVERE, "Error retrieving key {0}!", key);
             return Optional.empty();
         }
     }
@@ -144,7 +144,7 @@ public class ZookeeperConfigurationSource implements ConfigurationSource {
         } catch (KeeperException.NoNodeException e) {
             return Optional.empty();
         } catch (KeeperException | InterruptedException e) {
-            e.printStackTrace();
+            log.log(Level.SEVERE, "Error retrieving key {0}!", key);
             return Optional.empty();
         }
     }
@@ -191,7 +191,7 @@ public class ZookeeperConfigurationSource implements ConfigurationSource {
             } catch (KeeperException.NoNodeException ignored) {
                 // ignore non-existing nodes
             } catch (InterruptedException e) {
-                e.printStackTrace();
+                log.log(Level.SEVERE, "Transaction for watch {0} was interrupted!", key);
             } catch (KeeperException e) {
                 log.log(Level.SEVERE, "Unknown Zookeeper exception. Message: {0}", e.getMessage());
             }

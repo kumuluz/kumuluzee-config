@@ -334,7 +334,7 @@ public class ZookeeperConfigurationSource implements ConfigurationSource {
         
         for (String host : hostsArray) {
             try {
-                new URI(host);
+                new URI("my://" + host);
             } catch (URISyntaxException e) {
                 throw new IllegalArgumentException("Invalid Zookeeper host '" + host + "' specified!");
             }

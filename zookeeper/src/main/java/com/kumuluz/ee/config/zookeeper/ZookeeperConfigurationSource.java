@@ -28,6 +28,7 @@ import com.kumuluz.ee.configuration.utils.ConfigurationDecoderUtils;
 import com.kumuluz.ee.configuration.utils.ConfigurationDispatcher;
 import com.kumuluz.ee.configuration.utils.ConfigurationUtil;
 import org.apache.zookeeper.*;
+import org.apache.zookeeper.data.Stat;
 
 import java.io.IOException;
 import java.net.URI;
@@ -178,15 +179,23 @@ public class ZookeeperConfigurationSource implements ConfigurationSource {
             try {
                 
                 String newValue = null;
-                try {
+                Stat nodeStatus = zooKeeper.exists(fullKey, watchedEvent -> {
+                    // node was created later
+                    if (watchedEvent.getType() == Watcher.Event.EventType.NodeCreated) {
+                        watch(key);
+                    }
+                });
+                if (nodeStatus != null) {
                     byte[] newValueBytes = zooKeeper.getData(fullKey, watchedEvent -> {
-                        if (watchedEvent.getType().equals(Watcher.Event.EventType.NodeDataChanged)) {
-                            watch(key);
+                        switch (watchedEvent.getType()) {
+                            case NodeDataChanged:
+                            case NodeCreated:
+                            case NodeDeleted:
+                            case NodeChildrenChanged:
+                                watch(key);
                         }
                     }, null);
                     newValue = new String(newValueBytes);
-                } catch (KeeperException.NoNodeException ignored) {
-                    // ignore non-existing nodes
                 }
                 
                 log.log(Level.INFO, "Value changed. Key: {0} New value: {1}",

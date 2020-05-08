@@ -9,8 +9,8 @@
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
-    <name>KumuluzEE Config Zookeeper</name>
-    <description>KumuluzEE Config extension for Zookeeper key/value store</description>
+    <name>KumuluzEE Config ZooKeeper</name>
+    <description>KumuluzEE Config extension for ZooKeeper key/value store</description>
 
     <artifactId>kumuluzee-config-zookeeper</artifactId>
 

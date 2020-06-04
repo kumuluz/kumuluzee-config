@@ -6,7 +6,7 @@
 
     <groupId>com.kumuluz.ee.config</groupId>
     <artifactId>kumuluzee-config</artifactId>
-    <version>1.3.0-SNAPSHOT</version>
+    <version>1.3.0</version>
     <modules>
         <module>etcd</module>
         <module>consul</module>
